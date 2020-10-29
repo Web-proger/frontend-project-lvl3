@@ -42,6 +42,5 @@ jobs:
       - name: Run linter
         run: make lint
 
-      # Раскоментить, когда появяться тесты
-      #- name: Run tests
-      #  run: make test
+      - name: Run tests
+        run: make test
