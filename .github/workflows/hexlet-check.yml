@@ -1,19 +1,27 @@
-name: hexlet-check
+# Name of workflow
+name: Node CI
 
+# Trigger the workflow on push or pull request
 on:
-  pull_request:
-  push:
-    branches:
-      - main
+  - push
+  - pull_request
 
 jobs:
   build:
+
+    # The type of machine to run the job on
     runs-on: ubuntu-latest
+
     strategy:
+      # Node versions list
       matrix:
-        node-version: [12.x]
+        node-version: [13.x]
+
     steps:
+      # Check-out repository under GitHub workspace
+      # https://github.com/actions/checkout
       - uses: actions/checkout@v2
+        # Step's name
       - name: Use Node.js ${{ matrix.node-version }}
         # Configures the node version used on GitHub-hosted runners
         # https://github.com/actions/setup-node
@@ -23,16 +31,16 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: npm install, build
-          # Install and build project
-          run: |
-            make install
-            make build
-          # Add environment variables
-          env:
-            CI: true
+        # Install and build project
+        run: |
+          make install
+          make build
+        # Add environment variables
+        env:
+          CI: true
 
-          - name: Run linter
-            run: make lint
+      - name: Run linter
+        run: make lint
 
-          - name: Run tests
-            run: make test
+      - name: Run tests
+        run: make test
