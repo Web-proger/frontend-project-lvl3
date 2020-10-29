@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Project for reading rss site news",
   "main": "index.js",
+  "jest": {
+    "verbose": true,
+    "testURL": "http://localhost/"
+  },
   "dependencies": {
     "bootstrap": "^4.5.3",
     "jquery": "^3.5.1",
