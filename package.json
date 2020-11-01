@@ -32,7 +32,8 @@
     "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
-    "test": "jest --colors"
+    "test": "jest --colors",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
