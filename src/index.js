@@ -8,14 +8,79 @@ const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
 const form = document.querySelector('.rss-form');
 const button = form.querySelector('#submit-button');
 const inputField = form.querySelector('#rss-input');
+const feeds = document.querySelector('.feeds');
+const posts = document.querySelector('.posts');
 
-// http://feeds.feedburner.com/css-live   - ёщё RSS
+// Регулярка для урла:
+// (^https?:\/{2})([a-zA-Z0-9\._-]+)(\.[a-zA-Z]{2,6})([\/a-zA-Z-])+(\?([a-zA-Z0-9=_\&.]*))?(#[a-zA-Z0-9_%\.]*)?$
+// http://feeds.feedburner.com/css-live xml 1.0  - ёщё RSS
+// https://3dnews.ru/workshop/rss/ rss 2.0
 inputField.value = 'https://ru.hexlet.io/lessons.rss';  // Для тестирования
 
 const state = {
+  status: 'input',
+  valid: false,
   feeds: [],
-}
+  posts: [],
+};
 
+const watchedObject = onChange(state, (path, value, previousValue) => {
+  if (path === 'feeds') {
+    // Заголовок Feeds
+    const feedsTitle = document.createElement('h2');
+    feedsTitle.textContent = 'Feeds';
+
+    // Список ul
+    const list = document.createElement('ul');
+    list.classList.add('list-group', 'mb-5');
+
+    // Элементы списка li
+    const listItem = document.createElement('li');
+    listItem.classList.add('list-group-item');
+    const listItemTitle = document.createElement('h3');
+    listItemTitle.textContent = value[0].title;
+    const listItemDescription = document.createElement('p');
+    listItemDescription.textContent = value[0].description;
+
+    // Формирую список
+    listItem.appendChild(listItemTitle);
+    listItem.appendChild(listItemDescription);
+    list.appendChild(listItem);
+
+    // Формирую блок фидов
+    feeds.appendChild(feedsTitle);
+    feeds.appendChild(list);
+  }
+
+  if (path === 'posts') {
+    console.log(value);
+    // Заголовок Posts
+    const postsTitle = document.createElement('h2');
+    postsTitle.textContent = 'Posts';
+
+    // Список ul постов
+    const postList = document.createElement('ul');
+    postList.classList.add('list-group');
+
+    // Элементы списка постов li
+    value.forEach((el) => {
+      console.log('link', el.link);
+      console.log('title', el.title);
+      const postsListItem = document.createElement('li');
+      postsListItem.classList.add('list-group-item');
+
+      const postsLink = document.createElement('a');
+      postsLink.textContent = el.title;
+      postsLink.href = el.link;
+
+      postsListItem.appendChild(postsLink);
+      postList.appendChild(postsListItem);
+    })
+
+    posts.appendChild(postsTitle);
+    posts.appendChild(postList);
+  }
+});
 
 const handleSubmit = (evt) => {
   evt.preventDefault();
@@ -27,72 +92,24 @@ const handleSubmit = (evt) => {
     .then((response) => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'application/xml');
-      const data = {};
-      data.feed = doc.querySelector('channel title').textContent;
-      data.description = doc.querySelector('channel description').textContent;
-      data.posts = [...doc.querySelectorAll('channel item')].map((el) => ({
+      const feedback = document.querySelector('.feedback');
+      feedback.textContent = 'Rss has been loaded';
+      feedback.classList.add('text-success');
+
+      watchedObject.feeds.push({
+        title: doc.querySelector('channel title').textContent,
+        description: doc.querySelector('channel description').textContent,
+      });
+
+      const postsData = doc.querySelectorAll('channel item');
+      const newPost = Array.from(postsData).map((el) => ({
         title: el.querySelector('title').textContent,
         link: el.querySelector('link').textContent,
       }));
 
-      const feeds = document.querySelector('.feeds');
-      const posts = document.querySelector('.posts');
-
-      // Заголовок Feeds
-      const feedsTitle = document.createElement('h2');
-      feedsTitle.textContent = 'Feeds';
-
-      // Список ul
-      const list = document.createElement('ul');
-      list.classList.add('list-group', 'mb-5');
-
-      // Элементы списка li
-      const listItem = document.createElement('li');
-      listItem.classList.add('list-group-item');
-      const listItemTitle = document.createElement('h3');
-      listItemTitle.textContent =data.feed;
-      const listItemDescription = document.createElement('p');
-      listItemDescription.textContent = data.description;
-
-      // Формирую список
-      listItem.appendChild(listItemTitle);
-      listItem.appendChild(listItemDescription);
-      list.appendChild(listItem);
-
-      // Формирую блок фидов
-      feeds.appendChild(feedsTitle);
-      feeds.appendChild(list);
-
-
-      // Заголовок Posts
-      const postsTitle = document.createElement('h2');
-      postsTitle.textContent = 'Posts';
-
-      // Список ul постов
-      const postList = document.createElement('ul');
-      postList.classList.add('list-group');
-
-      // Элементы списка постов li
-      data.posts.forEach(({link, title}) => {
-        const postsListItem = document.createElement('li');
-        postsListItem.classList.add('list-group-item');
-
-        const postsLink = document.createElement('a');
-        postsLink.textContent = title;
-        postsLink.href = link;
-
-        postsListItem.appendChild(postsLink);
-        postList.appendChild(postsListItem);
-
-      })
-
-      posts.appendChild(postsTitle);
-      posts.appendChild(postList);
-
-
+      watchedObject.posts.push(...newPost);
 
       console.log(doc);
-      console.log(data);
     })
     .catch((err) => {
       console.log(err);
