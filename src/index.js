@@ -14,7 +14,6 @@ inputField.value = 'https://ru.hexlet.io/lessons.rss';  // Для тестиро
 
 const state = {
   feeds: [],
-  posts: [],
 }
 
 
@@ -28,8 +27,16 @@ const handleSubmit = (evt) => {
     .then((response) => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'application/xml');
-      console.log(doc.querySelector('item'));
+      const data = {};
+      data.feed = doc.querySelector('channel title').textContent;
+      data.description = doc.querySelector('channel description').textContent;
+      data.posts = [...doc.querySelectorAll('channel item')].map((el) => ({
+        title: el.querySelector('title').textContent,
+        link: el.querySelector('link').textContent,
+      }));
+
       console.log(doc);
+      console.log(data);
     })
     .catch((err) => {
       console.log(err);
