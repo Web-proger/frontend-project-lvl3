@@ -8,6 +8,7 @@ const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
 const form = document.querySelector('.rss-form');
 const button = form.querySelector('#submit-button');
 const inputField = form.querySelector('#rss-input');
+const feedback = document.querySelector('.feedback');
 const feeds = document.querySelector('.feeds');
 const posts = document.querySelector('.posts');
 
@@ -15,16 +16,41 @@ const posts = document.querySelector('.posts');
 // (^https?:\/{2})([a-zA-Z0-9\._-]+)(\.[a-zA-Z]{2,6})([\/a-zA-Z-])+(\?([a-zA-Z0-9=_\&.]*))?(#[a-zA-Z0-9_%\.]*)?$
 // http://feeds.feedburner.com/css-live xml 1.0  - ёщё RSS
 // https://3dnews.ru/workshop/rss/ rss 2.0
-inputField.value = 'https://ru.hexlet.io/lessons.rss';  // Для тестирования
+inputField.value = 'https://ru.hexlet.io/lessons.rss'; // Для тестирования
 
 const state = {
   status: 'input',
   valid: false,
+  feedback: '',
   feeds: [],
   posts: [],
 };
 
 const watchedObject = onChange(state, (path, value, previousValue) => {
+  if (path === 'status') {
+    if (value === previousValue) return;
+    if (value === 'sending') {
+      button.setAttribute('disabled', true);
+    }
+    if (value === 'input') {
+      button.removeAttribute('disabled');
+    }
+  }
+
+  if (path === 'feedback') {
+    if (value === previousValue) return;
+    feedback.textContent = value;
+    if (value === '') {
+      feedback.classList.remove('text-success', 'text-danger');
+      return;
+    }
+    if (value === 'Rss has been loaded') {
+      feedback.classList.add('text-success');
+      return
+    }
+    feedback.classList.add('text-danger');
+  }
+
   if (path === 'feeds') {
     // Заголовок Feeds
     const feedsTitle = document.createElement('h2');
@@ -35,7 +61,7 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
     list.classList.add('list-group', 'mb-5');
 
     // Элементы списка li
-    value.forEach(({title, description}) => {
+    value.forEach(({ title, description }) => {
       const listItem = document.createElement('li');
       listItem.classList.add('list-group-item');
       const listItemTitle = document.createElement('h3');
@@ -64,7 +90,7 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
     postList.classList.add('list-group');
 
     // Элементы списка постов li
-    value.forEach(({link, title}) => {
+    value.forEach(({ link, title }) => {
       const postsListItem = document.createElement('li');
       postsListItem.classList.add('list-group-item');
 
@@ -74,7 +100,7 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
 
       postsListItem.appendChild(postsLink);
       postList.appendChild(postsListItem);
-    })
+    });
 
     posts.appendChild(postsTitle);
     posts.appendChild(postList);
@@ -83,16 +109,18 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
 
 const handleSubmit = (evt) => {
   evt.preventDefault();
+  watchedObject.feedback = '';
+
   const rssUrl = inputField.value;
   const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
 
+  watchedObject.status = 'sending';
   axios.get(url)
     .then((response) => {
+      watchedObject.status = 'input';
+      watchedObject.feedback = 'Rss has been loaded';
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'application/xml');
-      const feedback = document.querySelector('.feedback');
-      feedback.textContent = 'Rss has been loaded';
-      feedback.classList.add('text-success');
 
       watchedObject.feeds.push({
         title: doc.querySelector('channel title').textContent,
@@ -110,7 +138,8 @@ const handleSubmit = (evt) => {
       console.log(doc);
     })
     .catch((err) => {
-      console.log(err);
+      watchedObject.feedback = err.message;
+      watchedObject.status = 'input';
     });
 };
 
