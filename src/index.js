@@ -5,6 +5,8 @@ import watch from './view';
 
 // TODO уникальный записи в посты и фиды
 // TODO Избавится от inputField, даные формы получать в событии
+// TODO сопоставить посты с фидами через ID
+// TODO i18next только для текстов интерфейса
 
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
 
@@ -68,8 +70,8 @@ const handleSubmit = (evt) => {
       watchedObject.feedback = 'Rss has been loaded';
 
       const parser = new DOMParser();
-      const doc = parser.parseFromString(response.data, 'application/xml');
-
+      const doc = parser.parseFromString(response.data, 'text/html');
+      console.log(doc);
       watchedObject.feeds.unshift({
         title: doc.querySelector('channel title').textContent,
         description: doc.querySelector('channel description').textContent,
@@ -83,8 +85,6 @@ const handleSubmit = (evt) => {
       }));
 
       watchedObject.posts.unshift(...newPost);
-
-      console.log(doc);
     })
     .catch((err) => {
       watchedObject.feedback = err.message;
