@@ -76,6 +76,7 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
     });
 
     // Формирую блок фидов
+    feeds.innerHTML = '';
     feeds.appendChild(feedsTitle);
     feeds.appendChild(list);
   }
@@ -102,6 +103,7 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
       postList.appendChild(postsListItem);
     });
 
+    posts.innerHTML = '';
     posts.appendChild(postsTitle);
     posts.appendChild(postList);
   }
@@ -122,7 +124,7 @@ const handleSubmit = (evt) => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'application/xml');
 
-      watchedObject.feeds.push({
+      watchedObject.feeds.unshift({
         title: doc.querySelector('channel title').textContent,
         description: doc.querySelector('channel description').textContent,
       });
@@ -133,7 +135,7 @@ const handleSubmit = (evt) => {
         link: el.querySelector('link').textContent,
       }));
 
-      watchedObject.posts.push(...newPost);
+      watchedObject.posts.unshift(...newPost);
 
       console.log(doc);
     })
