@@ -30,15 +30,11 @@ const state = {
 };
 
 const getFeeds = (data) => data
-  .map(({ title, description }) => {
-    return `<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`
-  })
+  .map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`))
   .join('');
 
 const getPosts = (data) => data
-  .map(({ link, title }) => {
-    return `<li class="list-group-item"><a href="${link}">${title}</a></li>`;
-  })
+  .map(({ link, title }) => (`<li class="list-group-item"><a href="${link}">${title}</a></li>`))
   .join('');
 
 const watchedObject = onChange(state, (path, value, previousValue) => {
@@ -61,7 +57,7 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
       }
       if (value === 'Rss has been loaded') {
         feedback.classList.add('text-success');
-        return
+        return;
       }
       feedback.classList.add('text-danger');
       break;
@@ -73,6 +69,8 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
     case 'posts':
       posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getPosts(value)}</ul>`;
       break;
+    default:
+      throw new Error('Unknown path');
   }
 });
 
@@ -89,7 +87,7 @@ const handleSubmit = (evt) => {
     .then(() => {
       const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
       watchedObject.status = 'sending';
-      return axios.get(url)
+      return axios.get(url);
     })
     .then((response) => {
       watchedObject.status = 'input';
