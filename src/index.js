@@ -35,17 +35,19 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
     list.classList.add('list-group', 'mb-5');
 
     // Элементы списка li
-    const listItem = document.createElement('li');
-    listItem.classList.add('list-group-item');
-    const listItemTitle = document.createElement('h3');
-    listItemTitle.textContent = value[0].title;
-    const listItemDescription = document.createElement('p');
-    listItemDescription.textContent = value[0].description;
+    value.forEach(({title, description}) => {
+      const listItem = document.createElement('li');
+      listItem.classList.add('list-group-item');
+      const listItemTitle = document.createElement('h3');
+      listItemTitle.textContent = title;
+      const listItemDescription = document.createElement('p');
+      listItemDescription.textContent = description;
 
-    // Формирую список
-    listItem.appendChild(listItemTitle);
-    listItem.appendChild(listItemDescription);
-    list.appendChild(listItem);
+      // Формирую список
+      listItem.appendChild(listItemTitle);
+      listItem.appendChild(listItemDescription);
+      list.appendChild(listItem);
+    });
 
     // Формирую блок фидов
     feeds.appendChild(feedsTitle);
@@ -53,7 +55,6 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
   }
 
   if (path === 'posts') {
-    console.log(value);
     // Заголовок Posts
     const postsTitle = document.createElement('h2');
     postsTitle.textContent = 'Posts';
@@ -63,15 +64,13 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
     postList.classList.add('list-group');
 
     // Элементы списка постов li
-    value.forEach((el) => {
-      console.log('link', el.link);
-      console.log('title', el.title);
+    value.forEach(({link, title}) => {
       const postsListItem = document.createElement('li');
       postsListItem.classList.add('list-group-item');
 
       const postsLink = document.createElement('a');
-      postsLink.textContent = el.title;
-      postsLink.href = el.link;
+      postsLink.textContent = title;
+      postsLink.href = link;
 
       postsListItem.appendChild(postsLink);
       postList.appendChild(postsListItem);
@@ -86,7 +85,6 @@ const handleSubmit = (evt) => {
   evt.preventDefault();
   const rssUrl = inputField.value;
   const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
-  console.log(url);
 
   axios.get(url)
     .then((response) => {
