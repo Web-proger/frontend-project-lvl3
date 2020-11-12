@@ -1,7 +1,9 @@
 import 'bootstrap';
 import axios from 'axios';
-import yup from 'yup';
+import { string } from 'yup';
 import onChange from 'on-change';
+
+// TODO уникальный записи в посты и фиды
 
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
 
@@ -13,14 +15,15 @@ const feeds = document.querySelector('.feeds');
 const posts = document.querySelector('.posts');
 
 // Регулярка для урла:
-// (^https?:\/{2})([a-zA-Z0-9\._-]+)(\.[a-zA-Z]{2,6})([\/a-zA-Z-])+(\?([a-zA-Z0-9=_\&.]*))?(#[a-zA-Z0-9_%\.]*)?$
 // http://feeds.feedburner.com/css-live xml 1.0  - ёщё RSS
 // https://3dnews.ru/workshop/rss/ rss 2.0
 inputField.value = 'https://ru.hexlet.io/lessons.rss'; // Для тестирования
 
+// Схема валидации url
+const urlSchema = string().url();
+
 const state = {
   status: 'input',
-  valid: false,
   feedback: '',
   feeds: [],
   posts: [],
@@ -78,13 +81,20 @@ const handleSubmit = (evt) => {
   watchedObject.feedback = '';
 
   const rssUrl = inputField.value;
-  const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
 
-  watchedObject.status = 'sending';
-  axios.get(url)
+  urlSchema.isValid(rssUrl)
+    .then((valid) => {
+      if (!valid) throw new Error('Must be valid url');
+    })
+    .then(() => {
+      const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
+      watchedObject.status = 'sending';
+      return axios.get(url)
+    })
     .then((response) => {
       watchedObject.status = 'input';
       watchedObject.feedback = 'Rss has been loaded';
+
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'application/xml');
 
