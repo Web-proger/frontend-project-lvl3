@@ -25,6 +25,7 @@ const urlSchema = string().url();
 const state = {
   status: 'input',
   feedback: '',
+  valid: true,
   feeds: [],
   posts: [],
 };
@@ -61,6 +62,15 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
       }
       feedback.classList.add('text-danger');
       break;
+    // Валидность формы
+    case 'valid':
+      if (value === previousValue) return;
+      if (value) {
+        inputField.classList.remove('is-invalid');
+        return;
+      }
+      inputField.classList.add('is-invalid');
+      break;
     // Формирую блок фидов
     case 'feeds':
       feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getFeeds(value)}</ul>`;
@@ -82,7 +92,11 @@ const handleSubmit = (evt) => {
 
   urlSchema.isValid(rssUrl)
     .then((valid) => {
-      if (!valid) throw new Error('Must be valid url');
+      if (!valid) {
+        watchedObject.valid = false;
+        throw new Error('Must be valid url');
+      }
+      watchedObject.valid = true;
     })
     .then(() => {
       const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
