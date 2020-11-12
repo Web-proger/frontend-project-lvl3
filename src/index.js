@@ -1,18 +1,15 @@
 import 'bootstrap';
 import axios from 'axios';
 import { string } from 'yup';
-import onChange from 'on-change';
+import watch from './view';
 
 // TODO уникальный записи в посты и фиды
+// TODO Избавится от inputField, даные формы получать в событии
 
 const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
 
 const form = document.querySelector('.rss-form');
-const button = form.querySelector('#submit-button');
 const inputField = form.querySelector('#rss-input');
-const feedback = document.querySelector('.feedback');
-const feeds = document.querySelector('.feeds');
-const posts = document.querySelector('.posts');
 
 // Регулярка для урла:
 // http://feeds.feedburner.com/css-live xml 1.0  - ёщё RSS
@@ -22,6 +19,7 @@ inputField.value = 'https://ru.hexlet.io/lessons.rss'; // Для тестиро�
 // Схема валидации url
 const urlSchema = string().url();
 
+// Модель стейта
 const state = {
   status: 'input',
   feedback: '',
@@ -30,63 +28,7 @@ const state = {
   posts: [],
 };
 
-const getFeeds = (data) => data
-  .map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`))
-  .join('');
-
-const getPosts = (data) => data
-  .map(({ link, title }) => (`<li class="list-group-item"><a href="${link}">${title}</a></li>`))
-  .join('');
-
-const watchedObject = onChange(state, (path, value, previousValue) => {
-  switch (path) {
-    case 'status':
-      if (value === previousValue) return;
-      if (value === 'sending') {
-        button.setAttribute('disabled', true);
-      }
-      if (value === 'input') {
-        button.removeAttribute('disabled');
-        inputField.value = '';
-      }
-      if (value === 'error') {
-        button.removeAttribute('disabled');
-      }
-      break;
-    case 'feedback':
-      if (value === previousValue) return;
-      feedback.textContent = value;
-      if (value === '') {
-        feedback.classList.remove('text-success', 'text-danger');
-        return;
-      }
-      if (value === 'Rss has been loaded') {
-        feedback.classList.add('text-success');
-        return;
-      }
-      feedback.classList.add('text-danger');
-      break;
-    // Валидность формы
-    case 'valid':
-      if (value === previousValue) return;
-      if (value) {
-        inputField.classList.remove('is-invalid');
-        return;
-      }
-      inputField.classList.add('is-invalid');
-      break;
-    // Формирую блок фидов
-    case 'feeds':
-      feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getFeeds(value)}</ul>`;
-      break;
-    // Формирую блок постов
-    case 'posts':
-      posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getPosts(value)}</ul>`;
-      break;
-    default:
-      throw new Error('Unknown path');
-  }
-});
+const watchedObject = watch(state);
 
 const handleSubmit = (evt) => {
   evt.preventDefault();
