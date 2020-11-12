@@ -99,6 +99,16 @@ const handleSubmit = (evt) => {
       watchedObject.valid = true;
     })
     .then(() => {
+      if (watchedObject.feeds.length === 0) return;
+
+      const isLinkExists = watchedObject.feeds.filter((el) => el.link === rssUrl).length > 0;
+      if (isLinkExists) {
+        watchedObject.valid = false;
+        throw new Error('Rss already exists');
+      }
+      watchedObject.valid = true;
+    })
+    .then(() => {
       const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
       watchedObject.status = 'sending';
       return axios.get(url);
@@ -113,6 +123,7 @@ const handleSubmit = (evt) => {
       watchedObject.feeds.unshift({
         title: doc.querySelector('channel title').textContent,
         description: doc.querySelector('channel description').textContent,
+        link: rssUrl,
       });
 
       const postsData = doc.querySelectorAll('channel item');
