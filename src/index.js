@@ -95,6 +95,7 @@ const handleSubmit = (evt) => {
   const rssUrl = inputField.value;
 
   urlSchema.isValid(rssUrl)
+    // Валидность ссылки
     .then((valid) => {
       if (!valid) {
         watchedObject.valid = false;
@@ -102,6 +103,7 @@ const handleSubmit = (evt) => {
       }
       watchedObject.valid = true;
     })
+    // Уникальность ссылки
     .then(() => {
       if (watchedObject.feeds.length === 0) return;
 
@@ -112,11 +114,13 @@ const handleSubmit = (evt) => {
       }
       watchedObject.valid = true;
     })
+    // Запрос с указанным урлом
     .then(() => {
       const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
       watchedObject.status = 'sending';
       return axios.get(url);
     })
+    // Формирование списка Постов и Фидов
     .then((response) => {
       watchedObject.status = 'input';
       watchedObject.feedback = 'Rss has been loaded';
