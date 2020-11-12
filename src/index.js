@@ -26,86 +26,50 @@ const state = {
   posts: [],
 };
 
+const getFeeds = (data) => data
+  .map(({ title, description }) => {
+    return `<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`
+  })
+  .join('');
+
+const getPosts = (data) => data
+  .map(({ link, title }) => {
+    return `<li class="list-group-item"><a href="${link}">${title}</a></li>`;
+  })
+  .join('');
+
 const watchedObject = onChange(state, (path, value, previousValue) => {
-  if (path === 'status') {
-    if (value === previousValue) return;
-    if (value === 'sending') {
-      button.setAttribute('disabled', true);
-    }
-    if (value === 'input') {
-      button.removeAttribute('disabled');
-    }
-  }
-
-  if (path === 'feedback') {
-    if (value === previousValue) return;
-    feedback.textContent = value;
-    if (value === '') {
-      feedback.classList.remove('text-success', 'text-danger');
-      return;
-    }
-    if (value === 'Rss has been loaded') {
-      feedback.classList.add('text-success');
-      return
-    }
-    feedback.classList.add('text-danger');
-  }
-
-  if (path === 'feeds') {
-    // Заголовок Feeds
-    const feedsTitle = document.createElement('h2');
-    feedsTitle.textContent = 'Feeds';
-
-    // Список ul
-    const list = document.createElement('ul');
-    list.classList.add('list-group', 'mb-5');
-
-    // Элементы списка li
-    value.forEach(({ title, description }) => {
-      const listItem = document.createElement('li');
-      listItem.classList.add('list-group-item');
-      const listItemTitle = document.createElement('h3');
-      listItemTitle.textContent = title;
-      const listItemDescription = document.createElement('p');
-      listItemDescription.textContent = description;
-
-      // Формирую список
-      listItem.appendChild(listItemTitle);
-      listItem.appendChild(listItemDescription);
-      list.appendChild(listItem);
-    });
-
+  switch (path) {
+    case 'status':
+      if (value === previousValue) return;
+      if (value === 'sending') {
+        button.setAttribute('disabled', true);
+      }
+      if (value === 'input') {
+        button.removeAttribute('disabled');
+      }
+      break;
+    case 'feedback':
+      if (value === previousValue) return;
+      feedback.textContent = value;
+      if (value === '') {
+        feedback.classList.remove('text-success', 'text-danger');
+        return;
+      }
+      if (value === 'Rss has been loaded') {
+        feedback.classList.add('text-success');
+        return
+      }
+      feedback.classList.add('text-danger');
+      break;
     // Формирую блок фидов
-    feeds.innerHTML = '';
-    feeds.appendChild(feedsTitle);
-    feeds.appendChild(list);
-  }
-
-  if (path === 'posts') {
-    // Заголовок Posts
-    const postsTitle = document.createElement('h2');
-    postsTitle.textContent = 'Posts';
-
-    // Список ul постов
-    const postList = document.createElement('ul');
-    postList.classList.add('list-group');
-
-    // Элементы списка постов li
-    value.forEach(({ link, title }) => {
-      const postsListItem = document.createElement('li');
-      postsListItem.classList.add('list-group-item');
-
-      const postsLink = document.createElement('a');
-      postsLink.textContent = title;
-      postsLink.href = link;
-
-      postsListItem.appendChild(postsLink);
-      postList.appendChild(postsListItem);
-    });
-
-    posts.innerHTML = '';
-    posts.appendChild(postsTitle);
-    posts.appendChild(postList);
+    case 'feeds':
+      feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getFeeds(value)}</ul>`;
+      break;
+    // Формирую блок постов
+    case 'posts':
+      posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getPosts(value)}</ul>`;
+      break;
   }
 });
 
