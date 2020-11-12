@@ -47,6 +47,10 @@ const watchedObject = onChange(state, (path, value, previousValue) => {
       }
       if (value === 'input') {
         button.removeAttribute('disabled');
+        inputField.value = '';
+      }
+      if (value === 'error') {
+        button.removeAttribute('disabled');
       }
       break;
     case 'feedback':
@@ -138,7 +142,7 @@ const handleSubmit = (evt) => {
     })
     .catch((err) => {
       watchedObject.feedback = err.message;
-      watchedObject.status = 'input';
+      watchedObject.status = 'error';
     });
 };
 
