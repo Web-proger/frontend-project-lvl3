@@ -1,4 +1,5 @@
 import onChange from 'on-change';
+import i18next from 'i18next';
 
 const feedback = document.querySelector('.feedback');
 const feeds = document.querySelector('.feeds');
@@ -36,7 +37,7 @@ export default (state) => onChange(state, (path, value, previousValue) => {
         feedback.classList.remove('text-success', 'text-danger');
         return;
       }
-      if (value === 'Rss has been loaded') {
+      if (value === i18next.t('message.successMessage')) {
         feedback.classList.add('text-success');
         return;
       }

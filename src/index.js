@@ -1,8 +1,11 @@
 import 'bootstrap';
 import axios from 'axios';
 import { string } from 'yup';
+import i18next from 'i18next';
+
 import watch from './view';
 import parse from './parser';
+import en from './en';
 
 // TODO уникальный записи в посты и фиды
 // TODO Избавится от inputField, даные формы получать в событии
@@ -44,7 +47,7 @@ const handleSubmit = (evt) => {
     .then((valid) => {
       if (!valid) {
         watchedObject.valid = false;
-        throw new Error('Must be valid url');
+        throw new Error(i18next.t('message.noValidUrl'));
       }
       watchedObject.valid = true;
     })
@@ -55,7 +58,7 @@ const handleSubmit = (evt) => {
       const isLinkExists = watchedObject.feeds.filter((el) => el.link === rssUrl).length > 0;
       if (isLinkExists) {
         watchedObject.valid = false;
-        throw new Error('Rss already exists');
+        throw new Error(i18next.t('message.urlExists'));
       }
       watchedObject.valid = true;
     })
@@ -68,7 +71,7 @@ const handleSubmit = (evt) => {
     // Формирование списка Постов и Фидов
     .then((response) => {
       watchedObject.status = 'input';
-      watchedObject.feedback = 'Rss has been loaded';
+      watchedObject.feedback = i18next.t('message.successMessage');
 
       const rssData = parse(response.data.contents);
 
@@ -86,4 +89,20 @@ const handleSubmit = (evt) => {
     });
 };
 
-form.addEventListener('submit', handleSubmit);
+i18next.init({
+  lng: 'en',
+  debug: true,
+  resources: {
+    ...en,
+  },
+})
+  .then(() => {
+    document.querySelector('#title').innerHTML = i18next.t('title');
+    document.querySelector('#description').innerHTML = i18next.t('description');
+    document.querySelector('#example').innerHTML = i18next.t('example');
+    document.querySelector('#submit-button').innerHTML = i18next.t('buttonText');
+    document.querySelector('#footer-text').innerHTML = i18next.t('footerText');
+    document.querySelector('#footer-link-text').innerHTML = i18next.t('footerLinkText');
+
+    form.addEventListener('submit', handleSubmit);
+  });
