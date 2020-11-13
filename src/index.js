@@ -2,14 +2,14 @@ import 'bootstrap';
 import axios from 'axios';
 import { string } from 'yup';
 import watch from './view';
-import parse from './parser/parser';
+import parse from './parser';
 
 // TODO уникальный записи в посты и фиды
 // TODO Избавится от inputField, даные формы получать в событии
 // TODO сопоставить посты с фидами через ID
 // TODO i18next только для текстов интерфейса
 
-const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
+const PROXY_URL = 'https://api.allorigins.win';
 
 const form = document.querySelector('.rss-form');
 const inputField = form.querySelector('#rss-input');
@@ -61,7 +61,7 @@ const handleSubmit = (evt) => {
     })
     // Запрос с указанным урлом
     .then(() => {
-      const url = encodeURI(`${PROXY_URL}/${rssUrl}`);
+      const url = encodeURI(`${PROXY_URL}/get?url=${rssUrl}`);
       watchedObject.status = 'sending';
       return axios.get(url);
     })
@@ -70,10 +70,7 @@ const handleSubmit = (evt) => {
       watchedObject.status = 'input';
       watchedObject.feedback = 'Rss has been loaded';
 
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(response.data, 'text/xml');
-      console.log(doc);
-      const rssData = parse(doc);
+      const rssData = parse(response.data.contents);
 
       watchedObject.feeds.unshift({
         title: rssData.title,

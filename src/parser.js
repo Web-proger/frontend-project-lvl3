@@ -1,4 +1,7 @@
-export default (doc) => {
+export default (data) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(data, 'text/xml');
+
   const title = doc.querySelector('channel title').textContent;
   const description = doc.querySelector('channel description').textContent;
 
