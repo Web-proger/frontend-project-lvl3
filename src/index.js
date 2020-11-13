@@ -11,6 +11,7 @@ import en from './en';
 // TODO Избавится от inputField, даные формы получать в событии
 // TODO сопоставить посты с фидами через ID
 // TODO i18next только для текстов интерфейса
+// TODO переключение языков i18next
 
 const PROXY_URL = 'https://api.allorigins.win';
 
