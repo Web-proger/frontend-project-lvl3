@@ -2,6 +2,7 @@ import 'bootstrap';
 import axios from 'axios';
 import { string } from 'yup';
 import watch from './view';
+import parse from './parser/parser';
 
 // TODO уникальный записи в посты и фиды
 // TODO Избавится от inputField, даные формы получать в событии
@@ -70,21 +71,17 @@ const handleSubmit = (evt) => {
       watchedObject.feedback = 'Rss has been loaded';
 
       const parser = new DOMParser();
-      const doc = parser.parseFromString(response.data, 'text/html');
+      const doc = parser.parseFromString(response.data, 'text/xml');
       console.log(doc);
+      const rssData = parse(doc);
+
       watchedObject.feeds.unshift({
-        title: doc.querySelector('channel title').textContent,
-        description: doc.querySelector('channel description').textContent,
+        title: rssData.title,
+        description: rssData.description,
         link: rssUrl,
       });
 
-      const postsData = doc.querySelectorAll('channel item');
-      const newPost = Array.from(postsData).map((el) => ({
-        title: el.querySelector('title').textContent,
-        link: el.querySelector('link').textContent,
-      }));
-
-      watchedObject.posts.unshift(...newPost);
+      watchedObject.posts.unshift(...rssData.posts);
     })
     .catch((err) => {
       watchedObject.feedback = err.message;
