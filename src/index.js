@@ -9,7 +9,6 @@ import en from './en';
 
 // TODO уникальный записи в посты и фиды
 // TODO Избавится от inputField, даные формы получать в событии
-// TODO сопоставить посты с фидами через ID
 // TODO i18next только для текстов интерфейса
 // TODO переключение языков i18next
 
@@ -56,6 +55,7 @@ const handleSubmit = (evt) => {
     .then(() => {
       if (watchedObject.feeds.length === 0) return;
 
+      // Существет ли добаляемая ссылка
       const isLinkExists = watchedObject.feeds.filter((el) => el.link === rssUrl).length > 0;
       if (isLinkExists) {
         watchedObject.valid = false;
@@ -75,14 +75,18 @@ const handleSubmit = (evt) => {
       watchedObject.feedback = i18next.t('message.successMessage');
 
       const rssData = parse(response.data.contents);
+      const id = watchedObject.feeds.length;
+      const rssPosts = rssData.posts.map((item) => ({ ...item, id }));
+      console.log(rssPosts);
 
       watchedObject.feeds.unshift({
         title: rssData.title,
         description: rssData.description,
         link: rssUrl,
+        id,
       });
 
-      watchedObject.posts.unshift(...rssData.posts);
+      watchedObject.posts.unshift(...rssPosts);
     })
     .catch((err) => {
       watchedObject.feedback = err.message;
