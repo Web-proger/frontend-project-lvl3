@@ -42,19 +42,18 @@ const rssUpdate = () => {
   }
   watchedObject.feeds.forEach((feed) => {
     const url = encodeURI(`${PROXY_URL}/get?url=${feed.link}`);
-    const id = feed.id;
 
     Promise.resolve()
       .then(() => axios.get(url))
       .then((response) => {
         const currentPostsTitle = watchedObject.posts
-          .filter((el) => el.id === id)
+          .filter((el) => el.id === feed.id)
           .map((el) => el.title);
 
         const { posts } = parse(response.data.contents);
         const newPosts = posts
           .filter((post) => !currentPostsTitle.includes(post.title))
-          .map((post) => ({ ...post, id }));
+          .map((post) => ({ ...post, id: feed.id }));
         console.log('newPosts', newPosts);
 
         watchedObject.posts.unshift(...newPosts);
