@@ -15,6 +15,15 @@ const getPosts = (data) => data
   .map(({ link, title }) => (`<li class="list-group-item"><a href="${link}">${title}</a></li>`))
   .join('');
 
+const initInterface = () => {
+  document.querySelector('#title').innerHTML = i18next.t('title');
+  document.querySelector('#description').innerHTML = i18next.t('description');
+  document.querySelector('#example').innerHTML = i18next.t('example');
+  document.querySelector('#submit-button').innerHTML = i18next.t('buttonText');
+  document.querySelector('#footer-text').innerHTML = i18next.t('footerText');
+  document.querySelector('#footer-link-text').innerHTML = i18next.t('footerLinkText');
+};
+
 export default (state) => onChange(state, (path, value, previousValue) => {
   switch (path) {
     case 'status':
@@ -29,6 +38,14 @@ export default (state) => onChange(state, (path, value, previousValue) => {
       if (value === 'error') {
         button.removeAttribute('disabled');
       }
+      break;
+    case 'lang':
+      if (value === previousValue) return;
+      if (previousValue) {
+        document.querySelector(`#${previousValue}`).classList.remove('active');
+      }
+      document.querySelector(`#${value}`).classList.add('active');
+      i18next.changeLanguage(value).then(() => initInterface());
       break;
     case 'feedback':
       if (value === previousValue) return;

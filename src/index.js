@@ -9,10 +9,9 @@ import resources from './locales/index';
 
 // TODO уникальный записи в посты и фиды
 // TODO Избавится от inputField, даные формы получать в событии
-// TODO i18next только для текстов интерфейса
-// TODO переключение языков i18next
 
 const PROXY_URL = 'https://api.allorigins.win';
+const DEFAULT_LANGUAGE = 'en';
 
 const form = document.querySelector('.rss-form');
 const inputField = form.querySelector('#rss-input');
@@ -32,6 +31,7 @@ const state = {
   valid: true,
   feeds: [],
   posts: [],
+  lang: '',
 };
 
 const watchedObject = watch(state);
@@ -100,12 +100,10 @@ i18next.init({
   resources,
 })
   .then(() => {
-    document.querySelector('#title').innerHTML = i18next.t('title');
-    document.querySelector('#description').innerHTML = i18next.t('description');
-    document.querySelector('#example').innerHTML = i18next.t('example');
-    document.querySelector('#submit-button').innerHTML = i18next.t('buttonText');
-    document.querySelector('#footer-text').innerHTML = i18next.t('footerText');
-    document.querySelector('#footer-link-text').innerHTML = i18next.t('footerLinkText');
+    watchedObject.lang = DEFAULT_LANGUAGE;
 
     form.addEventListener('submit', handleSubmit);
+    document.querySelector('#buttons').addEventListener('click', (evt) => {
+      watchedObject.lang = evt.target.id;
+    });
   });
