@@ -4,7 +4,7 @@ import i18next from 'i18next';
 const feedback = document.querySelector('.feedback');
 const feeds = document.querySelector('.feeds');
 const posts = document.querySelector('.posts');
-const inputField = document.querySelector('#rss-input');
+const inputField = document.querySelector('[name=rss-input]');
 const button = document.querySelector('#submit-button');
 
 const getFeeds = (data) => data

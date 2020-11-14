@@ -8,18 +8,17 @@ import parse from './parser';
 import resources from './locales/index';
 
 // TODO уникальный записи в посты и фиды
-// TODO Избавится от inputField, даные формы получать в событии
+// TODO переделать обновление на Promise.all
 
 const PROXY_URL = 'https://api.allorigins.win';
 const DEFAULT_LANGUAGE = 'en';
-
-const form = document.querySelector('.rss-form');
-const inputField = form.querySelector('#rss-input');
+const UPDATE_TIME = 5000;
 
 // Регулярка для урла:
+// http://lorem-rss.herokuapp.com/feed?unit=second&interval=10
+// http://lorem-rss.herokuapp.com/feed?unit=minute
 // http://feeds.feedburner.com/css-live xml 1.0  - ёщё RSS
 // https://3dnews.ru/workshop/rss/ rss 2.0
-inputField.value = 'https://ru.hexlet.io/lessons.rss'; // Для тестирования
 
 // Схема валидации url
 const urlSchema = string().url();
@@ -36,11 +35,45 @@ const state = {
 
 const watchedObject = watch(state);
 
+const rssUpdate = () => {
+  if (watchedObject.feeds.length === 0) {
+    setTimeout(rssUpdate, UPDATE_TIME);
+    return;
+  }
+  watchedObject.feeds.forEach((feed) => {
+    const url = encodeURI(`${PROXY_URL}/get?url=${feed.link}`);
+    const id = feed.id;
+
+    Promise.resolve()
+      .then(() => axios.get(url))
+      .then((response) => {
+        const currentPostsTitle = watchedObject.posts
+          .filter((el) => el.id === id)
+          .map((el) => el.title);
+
+        const { posts } = parse(response.data.contents);
+        const newPosts = posts
+          .filter((post) => !currentPostsTitle.includes(post.title))
+          .map((post) => ({ ...post, id }));
+        console.log('newPosts', newPosts);
+
+        watchedObject.posts.unshift(...newPosts);
+      })
+      .catch((err) => {
+        console.log(err);
+        watchedObject.feedback = err.message;
+        watchedObject.status = 'error';
+      });
+  });
+  setTimeout(rssUpdate, UPDATE_TIME);
+};
+
 const handleSubmit = (evt) => {
   evt.preventDefault();
   watchedObject.feedback = '';
 
-  const rssUrl = inputField.value;
+  const formData = new FormData(evt.target);
+  const rssUrl = formData.get('rss-input');
 
   urlSchema.isValid(rssUrl)
     // Валидность ссылки
@@ -77,7 +110,6 @@ const handleSubmit = (evt) => {
       const rssData = parse(response.data.contents);
       const id = watchedObject.feeds.length;
       const rssPosts = rssData.posts.map((item) => ({ ...item, id }));
-      console.log(rssPosts);
 
       watchedObject.feeds.unshift({
         title: rssData.title,
@@ -96,14 +128,16 @@ const handleSubmit = (evt) => {
 
 i18next.init({
   lng: 'en',
-  debug: true,
+  debug: false,
   resources,
 })
   .then(() => {
     watchedObject.lang = DEFAULT_LANGUAGE;
 
-    form.addEventListener('submit', handleSubmit);
+    document.querySelector('.rss-form').addEventListener('submit', handleSubmit);
     document.querySelector('#buttons').addEventListener('click', (evt) => {
       watchedObject.lang = evt.target.id;
     });
+
+    setTimeout(rssUpdate, UPDATE_TIME);
   });
