@@ -5,7 +5,7 @@ import i18next from 'i18next';
 
 import watch from './view';
 import parse from './parser';
-import en from './en';
+import resources from './locales/index';
 
 // TODO уникальный записи в посты и фиды
 // TODO Избавится от inputField, даные формы получать в событии
@@ -97,9 +97,7 @@ const handleSubmit = (evt) => {
 i18next.init({
   lng: 'en',
   debug: true,
-  resources: {
-    ...en,
-  },
+  resources,
 })
   .then(() => {
     document.querySelector('#title').innerHTML = i18next.t('title');
