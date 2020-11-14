@@ -54,7 +54,6 @@ const rssUpdate = () => {
         const newPosts = posts
           .filter((post) => !currentPostsTitle.includes(post.title))
           .map((post) => ({ ...post, id: feed.id }));
-        console.log('newPosts', newPosts);
 
         watchedObject.posts.unshift(...newPosts);
       })
