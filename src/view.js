@@ -25,9 +25,10 @@ const initInterface = () => {
 };
 
 export default (state) => onChange(state, (path, value, previousValue) => {
+  if (value === previousValue) return;
+
   switch (path) {
     case 'status':
-      if (value === previousValue) return;
       if (value === 'sending') {
         button.setAttribute('disabled', true);
       }
@@ -39,16 +40,14 @@ export default (state) => onChange(state, (path, value, previousValue) => {
         button.removeAttribute('disabled');
       }
       break;
-    case 'lang':
-      if (value === previousValue) return;
+    case 'language':
       if (previousValue) {
-        document.querySelector(`#${previousValue}`).classList.remove('active');
+        document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
       }
-      document.querySelector(`#${value}`).classList.add('active');
+      document.querySelector(`[data-language=${value}]`).classList.add('active');
       i18next.changeLanguage(value).then(() => initInterface());
       break;
     case 'feedback':
-      if (value === previousValue) return;
       feedback.textContent = value;
       if (value === '') {
         feedback.classList.remove('text-success', 'text-danger');
@@ -62,7 +61,6 @@ export default (state) => onChange(state, (path, value, previousValue) => {
       break;
     // Валидность формы
     case 'valid':
-      if (value === previousValue) return;
       if (value) {
         inputField.classList.remove('is-invalid');
         return;

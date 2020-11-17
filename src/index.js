@@ -30,7 +30,7 @@ const state = {
   valid: true,
   feeds: [],
   posts: [],
-  lang: '',
+  language: '',
 };
 
 const watchedObject = watch(state);
@@ -130,11 +130,11 @@ i18next.init({
   resources,
 })
   .then(() => {
-    watchedObject.lang = DEFAULT_LANGUAGE;
+    watchedObject.language = DEFAULT_LANGUAGE;
 
     document.querySelector('.rss-form').addEventListener('submit', handleSubmit);
     document.querySelector('#buttons').addEventListener('click', (evt) => {
-      watchedObject.lang = evt.target.id;
+      watchedObject.language = evt.target.dataset.language;
     });
 
     setTimeout(rssUpdate, UPDATE_TIME);
