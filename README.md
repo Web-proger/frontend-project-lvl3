@@ -2,17 +2,17 @@
 ![Node CI](https://github.com/Web-proger/frontend-project-lvl3/workflows/Node%20CI/badge.svg)
 [![Maintainability](https://api.codeclimate.com/v1/badges/7085507062709573b4a4/maintainability)](https://codeclimate.com/github/Web-proger/frontend-project-lvl3/maintainability)
 
-###Install
+### Install
 ```sh
 make install
 ```
 
-###Run
+### Run
 ```sh
 make build
 ```
 
-###Run in development mode
+### Run in development mode
 ```sh
 make develop
 ```
