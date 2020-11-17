@@ -7,16 +7,14 @@ import watch from './view';
 import parse from './parser';
 import resources from './locales/index';
 
-// TODO уникальный записи в посты и фиды
 // TODO переделать обновление на Promise.all
 
 const PROXY_URL = 'https://api.allorigins.win';
 const DEFAULT_LANGUAGE = 'en';
 const UPDATE_TIME = 5000;
 
-// Регулярка для урла:
+// RSS каналы для проверки
 // http://lorem-rss.herokuapp.com/feed?unit=second&interval=10
-// http://lorem-rss.herokuapp.com/feed?unit=minute
 // http://feeds.feedburner.com/css-live xml 1.0  - ёщё RSS
 // https://3dnews.ru/workshop/rss/ rss 2.0
 
@@ -35,6 +33,7 @@ const state = {
 
 const watchedObject = watch(state);
 
+// Обновление RSS с определенным интервалом
 const rssUpdate = () => {
   if (watchedObject.feeds.length === 0) {
     setTimeout(rssUpdate, UPDATE_TIME);
