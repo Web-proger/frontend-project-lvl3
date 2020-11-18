@@ -2,7 +2,6 @@
 root: true
 
 plugins:
-  - jest
   - babel
 
 env:
