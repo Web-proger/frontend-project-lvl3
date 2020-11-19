@@ -2,6 +2,7 @@ import 'bootstrap';
 import axios from 'axios';
 import { string } from 'yup';
 import i18next from 'i18next';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import watch from './view';
 import parse from './parser';
