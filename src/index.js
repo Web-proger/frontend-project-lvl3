@@ -102,12 +102,12 @@ const handleSubmit = (evt) => {
     })
     // Формирование списка Постов и Фидов
     .then((response) => {
-      watchedObject.status = 'input';
-      watchedObject.feedback = i18next.t('message.successMessage');
-
       const rssData = parse(response.data.contents);
       const id = watchedObject.feeds.length;
       const rssPosts = rssData.posts.map((item) => ({ ...item, id }));
+
+      watchedObject.status = 'input';
+      watchedObject.feedback = i18next.t('message.successMessage');
 
       watchedObject.feeds.unshift({
         title: rssData.title,
