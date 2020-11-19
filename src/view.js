@@ -7,11 +7,11 @@ const posts = document.querySelector('.posts');
 const inputField = document.querySelector('[name=rss-input]');
 const button = document.querySelector('#submit-button');
 
-const getFeeds = (data) => data
+const getFeedsHtml = (data) => data
   .map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`))
   .join('');
 
-const getPosts = (data) => data
+const getPostsHtml = (data) => data
   .map(({ link, title }) => (`<li class="list-group-item"><a href="${link}">${title}</a></li>`))
   .join('');
 
@@ -69,11 +69,11 @@ export default (state) => onChange(state, (path, value, previousValue) => {
       break;
     // Формирую блок фидов
     case 'feeds':
-      feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getFeeds(value)}</ul>`;
+      feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getFeedsHtml(value)}</ul>`;
       break;
     // Формирую блок постов
     case 'posts':
-      posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getPosts(value)}</ul>`;
+      posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getPostsHtml(value)}</ul>`;
       break;
     default:
       throw new Error('Unknown path');

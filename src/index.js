@@ -125,7 +125,7 @@ const handleSubmit = (evt) => {
 };
 
 i18next.init({
-  lng: 'en',
+  lng: DEFAULT_LANGUAGE,
   debug: false,
   resources,
 })
