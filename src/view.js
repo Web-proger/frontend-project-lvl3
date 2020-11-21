@@ -1,13 +1,20 @@
 import onChange from 'on-change';
 import i18next from 'i18next';
 
-const getFeedsHtml = (data) => data
-  .map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`))
-  .join('');
-
-const getPostsHtml = (data) => data
-  .map(({ link, title }) => (`<li class="list-group-item"><a href="${link}">${title}</a></li>`))
-  .join('');
+const getHtml = (data, type) => {
+  switch (type) {
+    case 'feeds':
+      return data
+        .map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`))
+        .join('');
+    case 'posts':
+      return data
+        .map(({ link, title }) => (`<li class="list-group-item"><a href="${link}">${title}</a></li>`))
+        .join('');
+    default:
+      throw new Error(i18next.t('message.successMessage'));
+  }
+};
 
 const initInterface = () => {
   document.querySelector('#title').innerHTML = i18next.t('title');
@@ -70,11 +77,11 @@ export default (state) => {
         break;
       // Формирую блок фидов
       case 'feeds':
-        feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getFeedsHtml(value)}</ul>`;
+        feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
         break;
       // Формирую блок постов
       case 'posts':
-        posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getPostsHtml(value)}</ul>`;
+        posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml(value, 'posts')}</ul>`;
         break;
       default:
         throw new Error('Unknown path');

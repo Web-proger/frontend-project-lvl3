@@ -11,6 +11,7 @@ export default {
       urlExists: 'Rss поток уже существует',
       noValidUrl: 'Ссылка не валидна',
       noValidRss: 'Этот источник не содержит валидного rss',
+      unknownType: 'неизвестный тип данных',
     },
   },
 };
