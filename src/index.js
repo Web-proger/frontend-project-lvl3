@@ -1,5 +1,6 @@
 import 'bootstrap';
 import axios from 'axios';
+import onChange from 'on-change';
 import { string } from 'yup';
 import i18next from 'i18next';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -22,22 +23,10 @@ const UPDATE_TIME = 5000;
 // Схема валидации url
 const urlSchema = string().url();
 
-// Модель стейта
-const state = {
-  status: 'input',
-  feedback: '',
-  valid: true,
-  feeds: [],
-  posts: [],
-  language: '',
-};
-
-const watchedObject = watch(state);
-
 // Обновление RSS с определенным интервалом
-const rssUpdate = () => {
+const rssUpdate = (watchedObject) => {
   if (watchedObject.feeds.length === 0) {
-    setTimeout(rssUpdate, UPDATE_TIME);
+    setTimeout(() => rssUpdate(watchedObject), UPDATE_TIME);
     return;
   }
   watchedObject.feeds.forEach((feed) => {
@@ -62,10 +51,10 @@ const rssUpdate = () => {
         watchedObject.status = 'error';
       });
   });
-  setTimeout(rssUpdate, UPDATE_TIME);
+  setTimeout(() => rssUpdate(watchedObject), UPDATE_TIME);
 };
 
-const handleSubmit = (evt) => {
+const handleSubmit = (evt, watchedObject) => {
   evt.preventDefault();
   watchedObject.feedback = '';
 
@@ -127,12 +116,26 @@ i18next.init({
   resources,
 })
   .then(() => {
+    // Модель стейта
+    const state = {
+      status: 'input',
+      feedback: '',
+      valid: true,
+      feeds: [],
+      posts: [],
+      language: '',
+    };
+
+    const watchedObject = onChange(state, (path, value, previousValue) => watch(watchedObject, path, value, previousValue));
+
     watchedObject.language = DEFAULT_LANGUAGE;
 
-    document.querySelector('.rss-form').addEventListener('submit', handleSubmit);
+    document.querySelector('.rss-form').addEventListener('submit', (evt) => handleSubmit(evt, watchedObject));
     document.querySelector('#buttons').addEventListener('click', (evt) => {
       watchedObject.language = evt.target.dataset.language;
     });
 
-    setTimeout(rssUpdate, UPDATE_TIME);
+    watch(watchedObject);
+
+    setTimeout(() => rssUpdate(watchedObject), UPDATE_TIME);
   });

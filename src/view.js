@@ -25,66 +25,64 @@ const initInterface = () => {
   document.querySelector('#footer-link-text').innerHTML = i18next.t('footerLinkText');
 };
 
-export default (state) => {
+export default (state, path, value, previousValue) => {
   const feedback = document.querySelector('.feedback');
   const feeds = document.querySelector('.feeds');
   const posts = document.querySelector('.posts');
   const inputField = document.querySelector('[name=rss-input]');
   const button = document.querySelector('#submit-button');
 
-  return onChange(state, (path, value, previousValue) => {
-    if (value === previousValue) return;
+  if (value === previousValue) return;
 
-    switch (path) {
-      case 'status':
-        if (value === 'sending') {
-          button.setAttribute('disabled', '');
-        }
-        if (value === 'input') {
-          button.removeAttribute('disabled');
-          inputField.value = '';
-        }
-        if (value === 'error') {
-          button.removeAttribute('disabled');
-        }
-        break;
-      case 'language':
-        if (previousValue) {
-          document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
-        }
-        document.querySelector(`[data-language=${value}]`).classList.add('active');
-        i18next.changeLanguage(value).then(initInterface);
-        break;
-      case 'feedback':
-        feedback.textContent = value;
-        if (value === '') {
-          feedback.classList.remove('text-success', 'text-danger');
-          return;
-        }
-        if (value === i18next.t('message.successMessage')) {
-          feedback.classList.add('text-success');
-          return;
-        }
-        feedback.classList.add('text-danger');
-        break;
-      // Валидность формы
-      case 'valid':
-        if (value) {
-          inputField.classList.remove('is-invalid');
-          return;
-        }
-        inputField.classList.add('is-invalid');
-        break;
-      // Формирую блок фидов
-      case 'feeds':
-        feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
-        break;
-      // Формирую блок постов
-      case 'posts':
-        posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml(value, 'posts')}</ul>`;
-        break;
-      default:
-        throw new Error('Unknown path');
-    }
-  });
+  switch (path) {
+    case 'status':
+      if (value === 'sending') {
+        button.setAttribute('disabled', '');
+      }
+      if (value === 'input') {
+        button.removeAttribute('disabled');
+        inputField.value = '';
+      }
+      if (value === 'error') {
+        button.removeAttribute('disabled');
+      }
+      break;
+    case 'language':
+      if (previousValue) {
+        document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
+      }
+      document.querySelector(`[data-language=${value}]`).classList.add('active');
+      i18next.changeLanguage(value).then(initInterface);
+      break;
+    case 'feedback':
+      feedback.textContent = value;
+      if (value === '') {
+        feedback.classList.remove('text-success', 'text-danger');
+        return;
+      }
+      if (value === i18next.t('message.successMessage')) {
+        feedback.classList.add('text-success');
+        return;
+      }
+      feedback.classList.add('text-danger');
+      break;
+    // Валидность формы
+    case 'valid':
+      if (value) {
+        inputField.classList.remove('is-invalid');
+        return;
+      }
+      inputField.classList.add('is-invalid');
+      break;
+    // Формирую блок фидов
+    case 'feeds':
+      feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
+      break;
+    // Формирую блок постов
+    case 'posts':
+      posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml(value, 'posts')}</ul>`;
+      break;
+    default:
+      throw new Error('Unknown path');
+  }
 };
