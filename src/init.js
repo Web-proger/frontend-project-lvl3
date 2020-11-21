@@ -1,17 +1,18 @@
 import i18next from 'i18next';
-import resources from './locales';
 import onChange from 'on-change';
-import watch from './view';
 import axios from 'axios';
+import { string } from 'yup';
+import watch from './view';
+import resources from './locales';
 import parse from './parser';
 import rssUpdate from './rssUpdate';
-import { string } from 'yup';
 import config from './config';
 
 // Схема валидации url
 const urlSchema = string().url();
 
-const handleSubmit = (evt, watchedObject) => {
+const handleSubmit = (evt, state) => {
+  const watchedObject = state;
   evt.preventDefault();
   watchedObject.feedback = '';
 
@@ -84,7 +85,10 @@ export default () => {
         language: '',
       };
 
-      const watchedObject = onChange(state, (path, value, previousValue) => watch(watchedObject, path, value, previousValue));
+      const watchedObject = onChange(
+        state,
+        (path, value, previousValue) => watch(watchedObject, path, value, previousValue),
+      );
 
       watchedObject.language = config.defaultLanguage;
 
@@ -97,5 +101,4 @@ export default () => {
 
       setTimeout(() => rssUpdate(watchedObject), config.updateTime);
     });
-
 };

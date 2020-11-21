@@ -4,7 +4,8 @@ import parse from './parser';
 import config from './config';
 
 // TODO переделать обновление на Promise.all
-const rssUpdate = (watchedObject) => {
+const rssUpdate = (state) => {
+  const watchedObject = state;
   if (watchedObject.feeds.length === 0) {
     setTimeout(() => rssUpdate(watchedObject), config.updateTime);
     return;
