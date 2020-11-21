@@ -1,18 +1,16 @@
 // Обновление RSS с определенным интервалом
 import axios from 'axios';
 import parse from './parser';
-
-const PROXY_URL = 'https://api.allorigins.win';
-const UPDATE_TIME = 5000;
+import config from './config';
 
 // TODO переделать обновление на Promise.all
 const rssUpdate = (watchedObject) => {
   if (watchedObject.feeds.length === 0) {
-    setTimeout(() => rssUpdate(watchedObject), UPDATE_TIME);
+    setTimeout(() => rssUpdate(watchedObject), config.updateTime);
     return;
   }
   watchedObject.feeds.forEach((feed) => {
-    const url = encodeURI(`${PROXY_URL}/get?url=${feed.link}`);
+    const url = encodeURI(`${config.proxy}/get?url=${feed.link}`);
 
     axios.get(url)
       .then((response) => {
@@ -33,7 +31,7 @@ const rssUpdate = (watchedObject) => {
         watchedObject.status = 'error';
       });
   });
-  setTimeout(() => rssUpdate(watchedObject), UPDATE_TIME);
+  setTimeout(() => rssUpdate(watchedObject), config.updateTime);
 };
 
 export default rssUpdate;

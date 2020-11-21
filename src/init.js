@@ -6,10 +6,7 @@ import axios from 'axios';
 import parse from './parser';
 import rssUpdate from './rssUpdate';
 import { string } from 'yup';
-
-const DEFAULT_LANGUAGE = 'en';
-const PROXY_URL = 'https://api.allorigins.win';
-const UPDATE_TIME = 5000;
+import config from './config';
 
 // Схема валидации url
 const urlSchema = string().url();
@@ -42,7 +39,7 @@ const handleSubmit = (evt, watchedObject) => {
     })
     // Запрос с указанным урлом
     .then(() => {
-      const url = encodeURI(`${PROXY_URL}/get?url=${rssUrl}`);
+      const url = encodeURI(`${config.proxy}/get?url=${rssUrl}`);
       watchedObject.status = 'sending';
       return axios.get(url);
     })
@@ -72,7 +69,7 @@ const handleSubmit = (evt, watchedObject) => {
 
 export default () => {
   i18next.init({
-    lng: DEFAULT_LANGUAGE,
+    lng: config.defaultLanguage,
     debug: false,
     resources,
   })
@@ -89,7 +86,7 @@ export default () => {
 
       const watchedObject = onChange(state, (path, value, previousValue) => watch(watchedObject, path, value, previousValue));
 
-      watchedObject.language = DEFAULT_LANGUAGE;
+      watchedObject.language = config.defaultLanguage;
 
       document.querySelector('.rss-form').addEventListener('submit', (evt) => handleSubmit(evt, watchedObject));
       document.querySelector('#buttons').addEventListener('click', (evt) => {
@@ -98,7 +95,7 @@ export default () => {
 
       watch(watchedObject);
 
-      setTimeout(() => rssUpdate(watchedObject), UPDATE_TIME);
+      setTimeout(() => rssUpdate(watchedObject), config.updateTime);
     });
 
 };
