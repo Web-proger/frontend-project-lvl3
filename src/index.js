@@ -43,8 +43,7 @@ const rssUpdate = () => {
   watchedObject.feeds.forEach((feed) => {
     const url = encodeURI(`${PROXY_URL}/get?url=${feed.link}`);
 
-    Promise.resolve()
-      .then(() => axios.get(url))
+    axios.get(url)
       .then((response) => {
         const currentPostsTitle = watchedObject.posts
           .filter((el) => el.id === feed.id)
@@ -76,23 +75,21 @@ const handleSubmit = (evt) => {
   urlSchema.isValid(rssUrl)
     // Валидность ссылки
     .then((valid) => {
+      watchedObject.valid = valid;
       if (!valid) {
-        watchedObject.valid = false;
         throw new Error(i18next.t('message.noValidUrl'));
       }
-      watchedObject.valid = true;
     })
     // Уникальность ссылки
     .then(() => {
       if (watchedObject.feeds.length === 0) return;
 
       // Существет ли добаляемая ссылка
-      const isLinkExists = watchedObject.feeds.filter((el) => el.link === rssUrl).length > 0;
-      if (isLinkExists) {
-        watchedObject.valid = false;
+      const isLinkUnique = watchedObject.feeds.filter((el) => el.link === rssUrl).length === 0;
+      watchedObject.valid = isLinkUnique;
+      if (!isLinkUnique) {
         throw new Error(i18next.t('message.urlExists'));
       }
-      watchedObject.valid = true;
     })
     // Запрос с указанным урлом
     .then(() => {

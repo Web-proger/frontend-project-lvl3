@@ -10,6 +10,7 @@ export default {
       successMessage: 'Rss has been loaded',
       urlExists: 'Rss already exists',
       noValidUrl: 'Must be valid url',
+      noValidRss: 'This source doesn\'t contain valid rss',
     },
   },
 };

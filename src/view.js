@@ -31,7 +31,7 @@ export default (state) => {
     switch (path) {
       case 'status':
         if (value === 'sending') {
-          button.setAttribute('disabled', true);
+          button.setAttribute('disabled', '');
         }
         if (value === 'input') {
           button.removeAttribute('disabled');
@@ -46,7 +46,7 @@ export default (state) => {
           document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
         }
         document.querySelector(`[data-language=${value}]`).classList.add('active');
-        i18next.changeLanguage(value).then(() => initInterface());
+        i18next.changeLanguage(value).then(initInterface);
         break;
       case 'feedback':
         feedback.textContent = value;

@@ -10,6 +10,7 @@ export default {
       successMessage: 'Rss загружен',
       urlExists: 'Rss поток уже существует',
       noValidUrl: 'Ссылка не валидна',
+      noValidRss: 'Этот источник не содержит валидного rss',
     },
   },
 };
