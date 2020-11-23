@@ -11,7 +11,8 @@ const rssUpdate = (state) => {
     return;
   }
   watchedObject.feeds.forEach((feed) => {
-    const url = encodeURI(`${config.proxy}/get?url=${feed.link}`);
+    const rssLink = encodeURIComponent(feed.link);
+    const url = `${config.proxy}/get?url=${rssLink}`;
 
     axios.get(url)
       .then((response) => {

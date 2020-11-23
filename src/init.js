@@ -40,22 +40,23 @@ const handleSubmit = (evt, state) => {
     })
     // Запрос с указанным урлом
     .then(() => {
-      const url = encodeURI(`${config.proxy}/get?url=${rssUrl}`);
+      const rssLink = encodeURIComponent(rssUrl);
+      const url = `${config.proxy}/get?url=${rssLink}`;
       watchedObject.status = 'sending';
       return axios.get(url);
     })
     // Формирование списка Постов и Фидов
     .then((response) => {
-      const rssData = parse(response.data.contents);
+      const { posts, description, title } = parse(response.data.contents);
       const id = watchedObject.feeds.length;
-      const rssPosts = rssData.posts.map((item) => ({ ...item, id }));
+      const rssPosts = posts.map((item) => ({ ...item, id }));
 
       watchedObject.status = 'input';
       watchedObject.feedback = i18next.t('message.successMessage');
 
       watchedObject.feeds.unshift({
-        title: rssData.title,
-        description: rssData.description,
+        title,
+        description,
         link: rssUrl,
         id,
       });
