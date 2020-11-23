@@ -16,11 +16,12 @@ const rssUpdate = (state) => {
 
     axios.get(url)
       .then((response) => {
+        const { posts } = parse(response.data.contents);
+
         const currentPostsTitle = watchedObject.posts
           .filter((el) => el.id === feed.id)
           .map((el) => el.title);
 
-        const { posts } = parse(response.data.contents);
         const newPosts = posts
           .filter((post) => !currentPostsTitle.includes(post.title))
           .map((post) => ({ ...post, id: feed.id }));
@@ -28,7 +29,6 @@ const rssUpdate = (state) => {
         watchedObject.posts.unshift(...newPosts);
       })
       .catch((err) => {
-        console.log(err);
         watchedObject.feedback = err.message;
         watchedObject.status = 'error';
       });
