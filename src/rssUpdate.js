@@ -24,9 +24,10 @@ const rssUpdate = (state) => {
 
         const newPosts = posts
           .filter((post) => !currentPostsTitle.includes(post.title))
-          .map((post) => ({ ...post, id: feed.id }));
+          .map((post, i) => ({ ...post, id: feed.id, isViewed: false, postId: watchedObject.posts.length + i }));
 
         watchedObject.posts.unshift(...newPosts);
+        console.log(watchedObject.posts);
       })
       .catch((err) => {
         watchedObject.feedback = err.message;

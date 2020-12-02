@@ -45,7 +45,7 @@ export default (evt, state) => {
     .then((response) => {
       const { posts, description, title } = parse(response.data.contents);
       const id = watchedObject.feeds.length;
-      const rssPosts = posts.map((item) => ({ ...item, id }));
+      const rssPosts = posts.map((item, i) => ({ ...item, id, isViewed: false, postId: watchedObject.posts.length + i }));
 
       watchedObject.status = 'input';
       watchedObject.feedback = i18next.t('message.successMessage');

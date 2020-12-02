@@ -8,7 +8,12 @@ const getHtml = (data, type) => {
         .join('');
     case 'posts':
       return data
-        .map(({ link, title }) => (`<li class="list-group-item"><a href="${link}">${title}</a></li>`))
+        .map(({ link, title, postId }) => (`
+            <li class="list-group-item">
+                <button id="${postId}" type="button" class="btn btn-primary"></button>
+                <a href="${link}">${title}</a>
+            </li>
+        `))
         .join('');
     default:
       throw new Error(i18next.t('message.successMessage'));

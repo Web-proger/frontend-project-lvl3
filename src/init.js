@@ -31,6 +31,9 @@ export default () => {
       watchedObject.language = config.defaultLanguage;
 
       document.querySelector('.rss-form').addEventListener('submit', (evt) => addRss(evt, watchedObject));
+      document.querySelector('.posts').addEventListener('click', (evt) => {
+        console.log(evt.target);
+      });
       document.querySelector('#buttons').addEventListener('click', (evt) => {
         watchedObject.language = evt.target.dataset.language;
       });
