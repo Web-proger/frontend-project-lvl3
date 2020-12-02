@@ -1,5 +1,6 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '/src/style.css';
 import runApp from './init';
 
 // RSS каналы для проверки
