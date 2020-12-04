@@ -29,7 +29,7 @@ const initInterface = () => {
   document.querySelector('#footer-link-text').innerHTML = i18next.t('footerLinkText');
 };
 
-export default (state, path, value, previousValue) => {
+export default (path, value, previousValue) => {
   const feedback = document.querySelector('.feedback');
   const feeds = document.querySelector('.feeds');
   const posts = document.querySelector('.posts');
@@ -40,6 +40,10 @@ export default (state, path, value, previousValue) => {
 
 
   if (value === previousValue) return;
+  const regExp = RegExp(/^posts.\d.isViewed$/);
+
+  console.log(path);
+  if (regExp.test(path)) return;
 
   console.log(path);
 

@@ -28,21 +28,25 @@ export default () => {
         }
       };
 
-      const watchedObject = onChange(
-        state,
-        (path, value, previousValue) => view(watchedObject, path, value, previousValue),
-      );
+      const watchedObject = onChange(state, view);
 
       watchedObject.language = config.defaultLanguage;
 
+      // Отправка формы
       document.querySelector('.rss-form').addEventListener('submit', (evt) => addRss(evt, watchedObject));
+      // Открытие модального окна
       document.querySelector('.posts').addEventListener('click', (evt) => {
-        const id = Number(evt.target.id);
-        const post = watchedObject.posts.find((post) => post.postId === id);
+        const previewId = Number(evt.target.id);
+        const posts = [...watchedObject.posts];
+        const post = posts.find((el) => el.postId === previewId);
+
         if (post === 'undefined') return;
+
+        post.isViewed = true
         watchedObject.modal = { ...post };
-        post.isViewed = true;
+        watchedObject.posts = posts;
       });
+      // Переключение языков
       document.querySelector('#buttons').addEventListener('click', (evt) => {
         watchedObject.language = evt.target.dataset.language;
       });
