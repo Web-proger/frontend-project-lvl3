@@ -3,18 +3,19 @@ import axios from 'axios';
 import parse from './parser';
 import config from './config';
 
-// TODO переделать обновление на Promise.all
+// TODO сделать глушилку ошибок для promises в Promise.all
 const rssUpdate = (state) => {
   const watchedObject = state;
   if (watchedObject.feeds.length === 0) {
     setTimeout(() => rssUpdate(watchedObject), config.updateTime);
     return;
   }
-  watchedObject.feeds.forEach((feed) => {
+
+  const promises = watchedObject.feeds.map((feed) => {
     const rssLink = encodeURIComponent(feed.link);
     const url = `${config.proxy}/get?url=${rssLink}`;
 
-    axios.get(url)
+    return axios.get(url)
       .then((response) => {
         const { posts } = parse(response.data.contents);
 
@@ -22,19 +23,26 @@ const rssUpdate = (state) => {
           .filter((el) => el.id === feed.id)
           .map((el) => el.title);
 
-        const newPosts = posts
+        return posts
           .filter((post) => !currentPostsTitle.includes(post.title))
           .map((post, i) => ({ ...post, id: feed.id, isViewed: false, postId: watchedObject.posts.length + i }));
-
-        watchedObject.posts.unshift(...newPosts);
-        console.log(watchedObject.posts);
       })
-      .catch((err) => {
-        watchedObject.feedback = err.message;
-        watchedObject.status = 'error';
+      .catch(() => {
+        return [];
       });
   });
-  setTimeout(() => rssUpdate(watchedObject), config.updateTime);
+
+  Promise.all(promises)
+    .then((data) => {
+      console.log('data!!!', data);
+      // const newPosts = data.reduce((posts, acc ) => [...posts, ...acc], []);
+      const newPosts = data.flat();
+      console.log('newPosts!!!', newPosts);
+
+      watchedObject.posts.unshift(...newPosts);
+    }).then(() => {
+      setTimeout(() => rssUpdate(watchedObject), config.updateTime);
+    })
 };
 
 export default rssUpdate;

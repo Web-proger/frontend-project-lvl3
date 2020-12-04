@@ -41,8 +41,6 @@ export default (path, value, previousValue) => {
   const regExp = RegExp(/^posts.\d.isViewed$/);
   if (value === previousValue || regExp.test(path)) return;
 
-  console.log(path);
-
   switch (path) {
     case 'status':
       if (value === 'sending') {
@@ -64,7 +62,6 @@ export default (path, value, previousValue) => {
       i18next.changeLanguage(value).then(initInterface);
       break;
     case 'modal':
-      console.log(value);
       modalLink.innerHTML = value.title;
       modalLink.href = value.link;
       modalDescription.innerHTML = value.description;
