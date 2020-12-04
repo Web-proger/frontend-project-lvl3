@@ -38,12 +38,8 @@ export default (path, value, previousValue) => {
   const modalLink = document.querySelector('#modalLink');
   const modalDescription = document.querySelector('#postDescription');
 
-
-  if (value === previousValue) return;
   const regExp = RegExp(/^posts.\d.isViewed$/);
-
-  console.log(path);
-  if (regExp.test(path)) return;
+  if (value === previousValue || regExp.test(path)) return;
 
   console.log(path);
 
