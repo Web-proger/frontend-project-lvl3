@@ -23,6 +23,7 @@ export default () => {
         language: '',
         modal: {
           title: '',
+          description: '',
           link: '',
         }
       };

@@ -15,6 +15,7 @@ export default (data) => {
   const postsData = doc.querySelectorAll('channel item');
   const posts = Array.from(postsData).map((el) => ({
     title: el.querySelector('title').textContent,
+    description: el.querySelector('description').textContent,
     link: el.querySelector('link').textContent,
   }));
 

@@ -35,8 +35,8 @@ export default (state, path, value, previousValue) => {
   const posts = document.querySelector('.posts');
   const inputField = document.querySelector('[name=rss-input]');
   const button = document.querySelector('#submit-button');
-  const modalTitle = document.querySelector('#modalLongTitle');
   const modalLink = document.querySelector('#modalLink');
+  const modalDescription = document.querySelector('#postDescription');
 
 
   if (value === previousValue) return;
@@ -65,9 +65,9 @@ export default (state, path, value, previousValue) => {
       break;
     case 'modal':
       console.log(value);
-      modalTitle.innerHTML = value.title;
-      modalLink.innerHTML = value.link;
+      modalLink.innerHTML = value.title;
       modalLink.href = value.link;
+      modalDescription.innerHTML = value.description;
       break;
     case 'feedback':
       feedback.textContent = value;
