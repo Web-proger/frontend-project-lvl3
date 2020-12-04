@@ -21,6 +21,10 @@ export default () => {
         feeds: [],
         posts: [],
         language: '',
+        modal: {
+          title: '',
+          link: '',
+        }
       };
 
       const watchedObject = onChange(
@@ -32,7 +36,11 @@ export default () => {
 
       document.querySelector('.rss-form').addEventListener('submit', (evt) => addRss(evt, watchedObject));
       document.querySelector('.posts').addEventListener('click', (evt) => {
-        console.log(evt.target);
+        const id = Number(evt.target.id);
+        const post = watchedObject.posts.find((post) => post.postId === id);
+        if (post === 'undefined') return;
+        watchedObject.modal = { ...post };
+        post.isViewed = true;
       });
       document.querySelector('#buttons').addEventListener('click', (evt) => {
         watchedObject.language = evt.target.dataset.language;

@@ -8,9 +8,9 @@ const getHtml = (data, type) => {
         .join('');
     case 'posts':
       return data
-        .map(({ link, title, postId }) => (`
-            <li class="list-group-item">
-                <button id="${postId}" type="button" class="btn btn-primary"></button>
+        .map(({ link, title, postId, isViewed }) => (`
+            <li class="list-group-item ${isViewed ? 'font-weight-normal' : 'font-weight-bold'}">
+                <button id="${postId}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal"></button>
                 <a href="${link}">${title}</a>
             </li>
         `))
@@ -35,8 +35,13 @@ export default (state, path, value, previousValue) => {
   const posts = document.querySelector('.posts');
   const inputField = document.querySelector('[name=rss-input]');
   const button = document.querySelector('#submit-button');
+  const modalTitle = document.querySelector('#modalLongTitle');
+  const modalLink = document.querySelector('#modalLink');
+
 
   if (value === previousValue) return;
+
+  console.log(path);
 
   switch (path) {
     case 'status':
@@ -57,6 +62,12 @@ export default (state, path, value, previousValue) => {
       }
       document.querySelector(`[data-language=${value}]`).classList.add('active');
       i18next.changeLanguage(value).then(initInterface);
+      break;
+    case 'modal':
+      console.log(value);
+      modalTitle.innerHTML = value.title;
+      modalLink.innerHTML = value.link;
+      modalLink.href = value.link;
       break;
     case 'feedback':
       feedback.textContent = value;
