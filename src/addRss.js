@@ -1,40 +1,14 @@
 // Схема валидации url
-import { string } from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
 import config from './config';
 import parse from './parser';
 
-const urlSchema = string().url();
-
-export default (evt, state) => {
+export default (rssUrl, state) => {
   const watchedState = state;
-  evt.preventDefault();
-  watchedState.form.feedback = '';
 
-  const formData = new FormData(evt.target);
-  const rssUrl = formData.get('rss-input');
-
-  urlSchema.isValid(rssUrl)
-    // Валидность ссылки
-    .then((valid) => {
-      watchedState.form.valid = valid;
-      if (!valid) {
-        throw new Error(i18next.t('message.noValidUrl'));
-      }
-    })
-    // Уникальность ссылки
-    .then(() => {
-      if (watchedState.feeds.length === 0) return;
-
-      // Существет ли добаляемая ссылка
-      const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
-      watchedState.form.valid = isLinkUnique;
-      if (!isLinkUnique) {
-        throw new Error(i18next.t('message.urlExists'));
-      }
-    })
-    // Запрос с указанным урлом
+  // Запрос с указанным урлом
+  return Promise.resolve()
     .then(() => {
       const url = `${config.proxy}/${rssUrl}`;
       watchedState.form.status = 'sending';
@@ -60,11 +34,6 @@ export default (evt, state) => {
         link: rssUrl,
         id,
       });
-
       watchedState.posts.unshift(...rssPosts);
-    })
-    .catch((err) => {
-      watchedState.form.feedback = err.message;
-      watchedState.form.status = 'error';
     });
 };
