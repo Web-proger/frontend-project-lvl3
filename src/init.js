@@ -3,7 +3,7 @@ import onChange from 'on-change';
 import view from './view';
 import resources from './locales';
 import addRss from './addRss';
-import rssUpdate from './rssUpdate';
+import updateRss from './updateRss';
 import config from './config';
 
 export default () => {
@@ -37,14 +37,17 @@ export default () => {
       // Открытие модального окна
       document.querySelector('.posts').addEventListener('click', (evt) => {
         const previewId = Number(evt.target.id);
-        const posts = [...watchedObject.posts];
-        const post = posts.find((el) => el.postId === previewId);
+        const post = watchedObject.posts.find((el) => el.postId === previewId);
 
         if (post === 'undefined') return;
 
         post.isViewed = true
-        watchedObject.modal = { ...post };
-        watchedObject.posts = posts;
+        watchedObject.modal = {
+          title: post.title,
+          description: post.description,
+          link: post.link,
+        };
+        watchedObject.posts = [...watchedObject.posts];
       });
       // Переключение языков
       document.querySelector('#buttons').addEventListener('click', (evt) => {
@@ -53,6 +56,6 @@ export default () => {
 
       view(watchedObject);
 
-      setTimeout(() => rssUpdate(watchedObject), config.updateTime);
+      setTimeout(() => updateRss(watchedObject), config.updateTime);
     });
 };
