@@ -4,16 +4,14 @@ import parse from './parser';
 import config from './config';
 
 // TODO сделать глушилку ошибок для promises в Promise.all
-const rssUpdate = (state) => {
+const updateRss = (state) => {
   const watchedObject = state;
   if (watchedObject.feeds.length === 0) {
-    setTimeout(() => rssUpdate(watchedObject), config.updateTime);
+    setTimeout(() => updateRss(watchedObject), config.updateTime);
     return;
   }
 
   const promises = watchedObject.feeds.map((feed) => {
-    //const rssLink = encodeURIComponent(feed.link);
-    //const url = `${config.proxy}/get?url=${rssLink}`;
     const url = `${config.proxy}/${feed.link}`;
 
     return axios.get(url)
@@ -36,15 +34,12 @@ const rssUpdate = (state) => {
 
   Promise.all(promises)
     .then((data) => {
-      console.log('data!!!', data);
-      // const newPosts = data.reduce((posts, acc ) => [...posts, ...acc], []);
       const newPosts = data.flat();
-      console.log('newPosts!!!', newPosts);
 
       watchedObject.posts.unshift(...newPosts);
     }).then(() => {
-      setTimeout(() => rssUpdate(watchedObject), config.updateTime);
+      setTimeout(() => updateRss(watchedObject), config.updateTime);
     })
 };
 
-export default rssUpdate;
+export default updateRss;
