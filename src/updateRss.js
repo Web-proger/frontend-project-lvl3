@@ -20,14 +20,14 @@ const updateRss = (state) => {
         const { posts } = parse(response.data);
 
         const currentPostsTitle = watchedState.posts
-          .filter((el) => el.id === feed.id)
-          .map((el) => el.title);
+          .filter((post) => post.feedId === feed.id)
+          .map((post) => post.title);
 
         return posts
           .filter((post) => !currentPostsTitle.includes(post.title))
           .map((post) => ({
             ...post,
-            id: feed.id,
+            feedId: feed.id,
             isViewed: false,
             postId: _.uniqueId(),
           }));

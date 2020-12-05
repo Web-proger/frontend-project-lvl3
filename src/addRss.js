@@ -21,7 +21,7 @@ export default (rssUrl, state) => {
       const feedId = _.uniqueId();
       const rssPosts = posts.map((item) => ({
         ...item,
-        id: feedId,
+        feedId,
         isViewed: false,
         postId: _.uniqueId(),
       }));
