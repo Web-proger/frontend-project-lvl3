@@ -4,7 +4,6 @@ import _ from 'lodash';
 import parse from './parser';
 import config from './config';
 
-// TODO сделать глушилку ошибок для promises в Promise.all
 const updateRss = (state) => {
   const watchedState = state;
   if (watchedState.feeds.length === 0) {
@@ -17,14 +16,11 @@ const updateRss = (state) => {
 
     return axios.get(url)
       .then((response) => {
-        const { posts } = parse(response.data);
+        const { posts: newPosts } = parse(response.data);
 
-        const currentPostsTitle = watchedState.posts
-          .filter((post) => post.feedId === feed.id)
-          .map((post) => post.title);
+        const currentPosts = watchedState.posts.filter((post) => post.feedId === feed.id);
 
-        return posts
-          .filter((post) => !currentPostsTitle.includes(post.title))
+        return _.differenceWith(newPosts, currentPosts, (a, b) => a.title === b.title)
           .map((post) => ({
             ...post,
             feedId: feed.id,
@@ -36,11 +32,10 @@ const updateRss = (state) => {
   });
 
   Promise.all(promises)
-    .then((data) => {
-      const newPosts = data.flat();
-
-      watchedState.posts.unshift(...newPosts);
-    }).then(() => {
+    .then((newPosts) => {
+      watchedState.posts.unshift(...newPosts.flat());
+    })
+    .then(() => {
       setTimeout(() => updateRss(watchedState), config.updateTime);
     });
 };
