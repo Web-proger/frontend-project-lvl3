@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import onChange from 'on-change';
 import { string } from 'yup';
-import view from './view';
+import watch from './watch';
 import resources from './locales';
 import addRss from './addRss';
 import updateRss from './updateRss';
@@ -58,11 +58,6 @@ const updateData = (evt, state) => {
   watchedState.posts = [...watchedState.posts];
 };
 
-const changeLanguage = (evt, state) => {
-  const watchedState = state;
-  watchedState.language = evt.target.dataset.language;
-};
-
 export default () => {
   i18next.init({
     lng: config.defaultLanguage,
@@ -87,7 +82,7 @@ export default () => {
         },
       };
 
-      const watchedState = onChange(state, view);
+      const watchedState = onChange(state, watch);
 
       watchedState.language = config.defaultLanguage;
 
@@ -96,7 +91,9 @@ export default () => {
       // Открытие модального окна
       document.querySelector('.posts').addEventListener('click', (evt) => updateData(evt, watchedState));
       // Переключение языков
-      document.querySelector('#buttons').addEventListener('click', (evt) => changeLanguage(evt, watchedState));
+      document.querySelector('#buttons').addEventListener('click', (evt) => {
+        watchedState.language = evt.target.dataset.language;
+      });
 
       setTimeout(() => updateRss(watchedState), config.updateTime);
 
