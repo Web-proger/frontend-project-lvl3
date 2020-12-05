@@ -5,13 +5,13 @@ import config from './config';
 
 // TODO сделать глушилку ошибок для promises в Promise.all
 const updateRss = (state) => {
-  const watchedObject = state;
-  if (watchedObject.feeds.length === 0) {
-    setTimeout(() => updateRss(watchedObject), config.updateTime);
+  const watchedState = state;
+  if (watchedState.feeds.length === 0) {
+    setTimeout(() => updateRss(watchedState), config.updateTime);
     return;
   }
 
-  const promises = watchedObject.feeds.map((feed) => {
+  const promises = watchedState.feeds.map((feed) => {
     const url = `${config.proxy}/${feed.link}`;
 
     return axios.get(url)
@@ -19,13 +19,13 @@ const updateRss = (state) => {
         //const { posts } = parse(response.data.contents);
         const { posts } = parse(response.data);
 
-        const currentPostsTitle = watchedObject.posts
+        const currentPostsTitle = watchedState.posts
           .filter((el) => el.id === feed.id)
           .map((el) => el.title);
 
         return posts
           .filter((post) => !currentPostsTitle.includes(post.title))
-          .map((post, i) => ({ ...post, id: feed.id, isViewed: false, postId: watchedObject.posts.length + i }));
+          .map((post, i) => ({ ...post, id: feed.id, isViewed: false, postId: watchedState.posts.length + i }));
       })
       .catch(() => {
         return [];
@@ -36,9 +36,9 @@ const updateRss = (state) => {
     .then((data) => {
       const newPosts = data.flat();
 
-      watchedObject.posts.unshift(...newPosts);
+      watchedState.posts.unshift(...newPosts);
     }).then(() => {
-      setTimeout(() => updateRss(watchedObject), config.updateTime);
+      setTimeout(() => updateRss(watchedState), config.updateTime);
     })
 };
 

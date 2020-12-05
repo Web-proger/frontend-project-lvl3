@@ -8,9 +8,9 @@ import parse from './parser';
 const urlSchema = string().url();
 
 export default (evt, state) => {
-  const watchedObject = state;
+  const watchedState = state;
   evt.preventDefault();
-  watchedObject.feedback = '';
+  watchedState.feedback = '';
 
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
@@ -18,18 +18,18 @@ export default (evt, state) => {
   urlSchema.isValid(rssUrl)
     // Валидность ссылки
     .then((valid) => {
-      watchedObject.valid = valid;
+      watchedState.valid = valid;
       if (!valid) {
         throw new Error(i18next.t('message.noValidUrl'));
       }
     })
     // Уникальность ссылки
     .then(() => {
-      if (watchedObject.feeds.length === 0) return;
+      if (watchedState.feeds.length === 0) return;
 
       // Существет ли добаляемая ссылка
-      const isLinkUnique = watchedObject.feeds.filter((el) => el.link === rssUrl).length === 0;
-      watchedObject.valid = isLinkUnique;
+      const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
+      watchedState.valid = isLinkUnique;
       if (!isLinkUnique) {
         throw new Error(i18next.t('message.urlExists'));
       }
@@ -37,29 +37,29 @@ export default (evt, state) => {
     // Запрос с указанным урлом
     .then(() => {
       const url = `${config.proxy}/${rssUrl}`;
-      watchedObject.status = 'sending';
+      watchedState.status = 'sending';
       return axios.get(url);
     })
     // Формирование списка Постов и Фидов
     .then((response) => {
       const { posts, description, title } = parse(response.data);
-      const id = watchedObject.feeds.length;
-      const rssPosts = posts.map((item, i) => ({ ...item, id, isViewed: false, postId: watchedObject.posts.length + i }));
+      const id = watchedState.feeds.length;
+      const rssPosts = posts.map((item, i) => ({ ...item, id, isViewed: false, postId: watchedState.posts.length + i }));
 
-      watchedObject.status = 'input';
-      watchedObject.feedback = i18next.t('message.successMessage');
+      watchedState.status = 'input';
+      watchedState.feedback = i18next.t('message.successMessage');
 
-      watchedObject.feeds.unshift({
+      watchedState.feeds.unshift({
         title,
         description,
         link: rssUrl,
         id,
       });
 
-      watchedObject.posts.unshift(...rssPosts);
+      watchedState.posts.unshift(...rssPosts);
     })
     .catch((err) => {
-      watchedObject.feedback = err.message;
-      watchedObject.status = 'error';
+      watchedState.feedback = err.message;
+      watchedState.status = 'error';
     });
 };
