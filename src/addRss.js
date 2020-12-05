@@ -10,7 +10,7 @@ const urlSchema = string().url();
 export default (evt, state) => {
   const watchedState = state;
   evt.preventDefault();
-  watchedState.feedback = '';
+  watchedState.form.feedback = '';
 
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
@@ -18,7 +18,7 @@ export default (evt, state) => {
   urlSchema.isValid(rssUrl)
     // Валидность ссылки
     .then((valid) => {
-      watchedState.valid = valid;
+      watchedState.form.valid = valid;
       if (!valid) {
         throw new Error(i18next.t('message.noValidUrl'));
       }
@@ -29,7 +29,7 @@ export default (evt, state) => {
 
       // Существет ли добаляемая ссылка
       const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
-      watchedState.valid = isLinkUnique;
+      watchedState.form.valid = isLinkUnique;
       if (!isLinkUnique) {
         throw new Error(i18next.t('message.urlExists'));
       }
@@ -37,7 +37,7 @@ export default (evt, state) => {
     // Запрос с указанным урлом
     .then(() => {
       const url = `${config.proxy}/${rssUrl}`;
-      watchedState.status = 'sending';
+      watchedState.form.status = 'sending';
       return axios.get(url);
     })
     // Формирование списка Постов и Фидов
@@ -51,8 +51,8 @@ export default (evt, state) => {
         postId: watchedState.posts.length + i,
       }));
 
-      watchedState.status = 'input';
-      watchedState.feedback = i18next.t('message.successMessage');
+      watchedState.form.status = 'input';
+      watchedState.form.feedback = i18next.t('message.successMessage');
 
       watchedState.feeds.unshift({
         title,
@@ -64,7 +64,7 @@ export default (evt, state) => {
       watchedState.posts.unshift(...rssPosts);
     })
     .catch((err) => {
-      watchedState.feedback = err.message;
-      watchedState.status = 'error';
+      watchedState.form.feedback = err.message;
+      watchedState.form.status = 'error';
     });
 };

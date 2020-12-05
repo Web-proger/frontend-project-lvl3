@@ -47,7 +47,7 @@ export default (path, value, previousValue) => {
   if (value === previousValue || regExp.test(path)) return;
 
   switch (path) {
-    case 'status':
+    case 'form.status':
       if (value === 'sending') {
         button.setAttribute('disabled', '');
       }
@@ -59,19 +59,7 @@ export default (path, value, previousValue) => {
         button.removeAttribute('disabled');
       }
       break;
-    case 'language':
-      if (previousValue) {
-        document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
-      }
-      document.querySelector(`[data-language=${value}]`).classList.add('active');
-      i18next.changeLanguage(value).then(initInterface);
-      break;
-    case 'modal':
-      modalLink.innerHTML = value.title;
-      modalLink.href = value.link;
-      modalDescription.innerHTML = value.description;
-      break;
-    case 'feedback':
+    case 'form.feedback':
       feedback.textContent = value;
       if (value === '') {
         feedback.classList.remove('text-success', 'text-danger');
@@ -84,12 +72,24 @@ export default (path, value, previousValue) => {
       feedback.classList.add('text-danger');
       break;
     // Валидность формы
-    case 'valid':
+    case 'form.valid':
       if (value) {
         inputField.classList.remove('is-invalid');
         return;
       }
       inputField.classList.add('is-invalid');
+      break;
+    case 'language':
+      if (previousValue) {
+        document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
+      }
+      document.querySelector(`[data-language=${value}]`).classList.add('active');
+      i18next.changeLanguage(value).then(initInterface);
+      break;
+    case 'modal':
+      modalLink.innerHTML = value.title;
+      modalLink.href = value.link;
+      modalDescription.innerHTML = value.description;
       break;
     // Формирую блок фидов
     case 'feeds':

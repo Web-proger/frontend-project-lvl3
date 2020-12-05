@@ -15,9 +15,11 @@ export default () => {
     .then(() => {
       // Модель стейта
       const state = {
-        status: 'input',
-        feedback: '',
-        valid: true,
+        form: {
+          status: 'input',
+          feedback: '',
+          valid: true,
+        },
         feeds: [],
         posts: [],
         language: '',
@@ -54,8 +56,8 @@ export default () => {
         watchedState.language = evt.target.dataset.language;
       });
 
-      view(watchedState);
-
       setTimeout(() => updateRss(watchedState), config.updateTime);
+
+      return 'success init';
     });
 };
