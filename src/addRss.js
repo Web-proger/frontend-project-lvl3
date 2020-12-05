@@ -1,6 +1,7 @@
 // Схема валидации url
 import i18next from 'i18next';
 import axios from 'axios';
+import _ from 'lodash';
 import config from './config';
 import parse from './parser';
 
@@ -17,12 +18,12 @@ export default (rssUrl, state) => {
     // Формирование списка Постов и Фидов
     .then((response) => {
       const { posts, description, title } = parse(response.data);
-      const id = watchedState.feeds.length;
-      const rssPosts = posts.map((item, i) => ({
+      const feedId = _.uniqueId();
+      const rssPosts = posts.map((item) => ({
         ...item,
-        id,
+        id: feedId,
         isViewed: false,
-        postId: watchedState.posts.length + i,
+        postId: _.uniqueId(),
       }));
 
       watchedState.form.status = 'input';
@@ -32,7 +33,7 @@ export default (rssUrl, state) => {
         title,
         description,
         link: rssUrl,
-        id,
+        id: feedId,
       });
       watchedState.posts.unshift(...rssPosts);
     });

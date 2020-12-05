@@ -43,7 +43,7 @@ const handleSubmit = (evt, state) => {
 
 const updateData = (evt, state) => {
   const watchedState = state;
-  const previewId = Number(evt.target.id);
+  const previewId = evt.target.id;
   const post = watchedState.posts.find((el) => el.postId === previewId);
 
   if (post === 'undefined') return;
@@ -82,16 +82,29 @@ export default () => {
         },
       };
 
+      // TODO понять как прокинуть в watch.js
+      const element = {
+        rssForm: document.querySelector('.rss-form'),
+        posts: document.querySelector('.posts'),
+        language: document.querySelector('#buttons'),
+        feedback: document.querySelector('.feedback'),
+        feeds: document.querySelector('.feeds'),
+        inputField: document.querySelector('[name=rss-input]'),
+        button: document.querySelector('#submit-button'),
+        modalLink: document.querySelector('#modalLink'),
+        modalDescription: document.querySelector('#postDescription'),
+      };
+
       const watchedState = onChange(state, watch);
 
       watchedState.language = config.defaultLanguage;
 
       // Отправка формы
-      document.querySelector('.rss-form').addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
+      element.rssForm.addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
       // Открытие модального окна
-      document.querySelector('.posts').addEventListener('click', (evt) => updateData(evt, watchedState));
+      element.posts.addEventListener('click', (evt) => updateData(evt, watchedState));
       // Переключение языков
-      document.querySelector('#buttons').addEventListener('click', (evt) => {
+      element.language.addEventListener('click', (evt) => {
         watchedState.language = evt.target.dataset.language;
       });
 

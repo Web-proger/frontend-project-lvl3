@@ -1,5 +1,6 @@
 // Обновление RSS с определенным интервалом
 import axios from 'axios';
+import _ from 'lodash';
 import parse from './parser';
 import config from './config';
 
@@ -24,11 +25,11 @@ const updateRss = (state) => {
 
         return posts
           .filter((post) => !currentPostsTitle.includes(post.title))
-          .map((post, i) => ({
+          .map((post) => ({
             ...post,
             id: feed.id,
             isViewed: false,
-            postId: watchedState.posts.length + i,
+            postId: _.uniqueId(),
           }));
       })
       .catch(() => []);
