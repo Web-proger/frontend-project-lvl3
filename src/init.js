@@ -25,7 +25,7 @@ export default () => {
           title: '',
           description: '',
           link: '',
-        }
+        },
       };
 
       const watchedState = onChange(state, view);
@@ -41,7 +41,7 @@ export default () => {
 
         if (post === 'undefined') return;
 
-        post.isViewed = true
+        post.isViewed = true;
         watchedState.modal = {
           title: post.title,
           description: post.description,

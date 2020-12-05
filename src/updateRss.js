@@ -16,7 +16,6 @@ const updateRss = (state) => {
 
     return axios.get(url)
       .then((response) => {
-        //const { posts } = parse(response.data.contents);
         const { posts } = parse(response.data);
 
         const currentPostsTitle = watchedState.posts
@@ -25,11 +24,14 @@ const updateRss = (state) => {
 
         return posts
           .filter((post) => !currentPostsTitle.includes(post.title))
-          .map((post, i) => ({ ...post, id: feed.id, isViewed: false, postId: watchedState.posts.length + i }));
+          .map((post, i) => ({
+            ...post,
+            id: feed.id,
+            isViewed: false,
+            postId: watchedState.posts.length + i,
+          }));
       })
-      .catch(() => {
-        return [];
-      });
+      .catch(() => []);
   });
 
   Promise.all(promises)
@@ -39,7 +41,7 @@ const updateRss = (state) => {
       watchedState.posts.unshift(...newPosts);
     }).then(() => {
       setTimeout(() => updateRss(watchedState), config.updateTime);
-    })
+    });
 };
 
 export default updateRss;
