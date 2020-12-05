@@ -12,12 +12,14 @@ const rssUpdate = (state) => {
   }
 
   const promises = watchedObject.feeds.map((feed) => {
-    const rssLink = encodeURIComponent(feed.link);
-    const url = `${config.proxy}/get?url=${rssLink}`;
+    //const rssLink = encodeURIComponent(feed.link);
+    //const url = `${config.proxy}/get?url=${rssLink}`;
+    const url = `${config.proxy}/${feed.link}`;
 
     return axios.get(url)
       .then((response) => {
-        const { posts } = parse(response.data.contents);
+        //const { posts } = parse(response.data.contents);
+        const { posts } = parse(response.data);
 
         const currentPostsTitle = watchedObject.posts
           .filter((el) => el.id === feed.id)

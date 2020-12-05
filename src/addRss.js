@@ -36,14 +36,16 @@ export default (evt, state) => {
     })
     // Запрос с указанным урлом
     .then(() => {
-      const rssLink = encodeURIComponent(rssUrl);
-      const url = `${config.proxy}/get?url=${rssLink}`;
+      //const rssLink = encodeURIComponent(rssUrl);
+      //const url = `${config.proxy}/get?url=${rssLink}`;
+      const url = `${config.proxy}/${rssUrl}`;
       watchedObject.status = 'sending';
       return axios.get(url);
     })
     // Формирование списка Постов и Фидов
     .then((response) => {
-      const { posts, description, title } = parse(response.data.contents);
+      //const { posts, description, title } = parse(response.data.contents);
+      const { posts, description, title } = parse(response.data);
       const id = watchedObject.feeds.length;
       const rssPosts = posts.map((item, i) => ({ ...item, id, isViewed: false, postId: watchedObject.posts.length + i }));
 

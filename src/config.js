@@ -1,5 +1,5 @@
 export default {
-  proxy: 'https://api.allorigins.win',
+  proxy: 'https://cors-anywhere.herokuapp.com',
   updateTime: 5000,
   defaultLanguage: 'en',
 };
