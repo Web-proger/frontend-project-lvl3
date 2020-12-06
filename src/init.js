@@ -26,12 +26,9 @@ const handleSubmit = (evt, state) => {
     })
     // Уникальность ссылки
     .then(() => {
-      if (watchedState.feeds.length > 0) {
-        // Существет ли добаляемая ссылка
-        const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
-        watchedState.form.valid = isLinkUnique;
-        if (!isLinkUnique) throw new Error(i18next.t('message.urlExists'));
-      }
+      const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
+      watchedState.form.valid = isLinkUnique;
+      if (!isLinkUnique) throw new Error(i18next.t('message.urlExists'));
 
       return addRss(rssUrl, watchedState);
     })
@@ -82,29 +79,16 @@ export default () => {
         },
       };
 
-      // TODO понять как прокинуть в watch.js
-      const element = {
-        rssForm: document.querySelector('.rss-form'),
-        posts: document.querySelector('.posts'),
-        language: document.querySelector('#buttons'),
-        feedback: document.querySelector('.feedback'),
-        feeds: document.querySelector('.feeds'),
-        inputField: document.querySelector('[name=rss-input]'),
-        button: document.querySelector('#submit-button'),
-        modalLink: document.querySelector('#modalLink'),
-        modalDescription: document.querySelector('#postDescription'),
-      };
-
       const watchedState = onChange(state, watch);
 
       watchedState.language = config.defaultLanguage;
 
       // Отправка формы
-      element.rssForm.addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
+      document.querySelector('.rss-form').addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
       // Открытие модального окна
-      element.posts.addEventListener('click', (evt) => updateData(evt, watchedState));
+      document.querySelector('.posts').addEventListener('click', (evt) => updateData(evt, watchedState));
       // Переключение языков
-      element.language.addEventListener('click', (evt) => {
+      document.querySelector('#buttons').addEventListener('click', (evt) => {
         watchedState.language = evt.target.dataset.language;
       });
 
