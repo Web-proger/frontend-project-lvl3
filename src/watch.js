@@ -15,7 +15,7 @@ const getHtml = (data, type) => {
           isViewed,
         }) => (`
             <li class="list-group-item ${isViewed ? 'font-weight-normal' : 'font-weight-bold'}">
-                <button id="${postId}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal"></button>
+                <button id="${postId}" type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#modal">View</button>
                 <a href="${link}">${title}</a>
             </li>
         `))
