@@ -1,5 +1,4 @@
 import i18next from 'i18next';
-import onChange from 'on-change';
 import axios from 'axios';
 import { string } from 'yup';
 import _ from 'lodash';
@@ -117,7 +116,17 @@ export default () => {
         },
       };
 
-      const watchedState = onChange(state, watch);
+      const element = {
+        feedback: document.querySelector('.feedback'),
+        feeds: document.querySelector('.feeds'),
+        posts: document.querySelector('.posts'),
+        inputField: document.querySelector('[name=rss-input]'),
+        button: document.querySelector('#submit-button'),
+        modalLink: document.querySelector('#modalLink'),
+        modalDescription: document.querySelector('#postDescription'),
+      };
+
+      const watchedState = watch(state, element);
 
       watchedState.language = config.defaultLanguage;
 

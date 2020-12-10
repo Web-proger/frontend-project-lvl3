@@ -1,3 +1,4 @@
+import onChange from 'on-change';
 import i18next from 'i18next';
 
 const getHtml = (data, type) => {
@@ -34,72 +35,69 @@ const initInterface = () => {
   document.querySelector('#footer-link-text').innerHTML = i18next.t('footerLinkText');
 };
 
-export default (path, value, previousValue) => {
-  const feedback = document.querySelector('.feedback');
-  const feeds = document.querySelector('.feeds');
-  const posts = document.querySelector('.posts');
-  const inputField = document.querySelector('[name=rss-input]');
-  const button = document.querySelector('#submit-button');
-  const modalLink = document.querySelector('#modalLink');
-  const modalDescription = document.querySelector('#postDescription');
+export default (state, elementObject) => {
+  const element = elementObject;
 
   const regExp = RegExp(/^posts.\d+.isViewed$/);
-  if (value === previousValue || regExp.test(path)) return;
 
-  switch (path) {
-    case 'form.status':
-      if (value === 'sending') {
-        button.setAttribute('disabled', '');
-      }
-      if (value === 'input') {
-        button.removeAttribute('disabled');
-        inputField.value = '';
-      }
-      if (value === 'error') {
-        button.removeAttribute('disabled');
-      }
-      break;
-    case 'form.feedback':
-      feedback.textContent = value;
-      if (value === '') {
-        feedback.classList.remove('text-success', 'text-danger');
-        return;
-      }
-      if (value === i18next.t('message.successMessage')) {
-        feedback.classList.add('text-success');
-        return;
-      }
-      feedback.classList.add('text-danger');
-      break;
-    // Валидность формы
-    case 'form.valid':
-      if (value) {
-        inputField.classList.remove('is-invalid');
-        return;
-      }
-      inputField.classList.add('is-invalid');
-      break;
-    case 'language':
-      if (previousValue) {
-        document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
-      }
-      document.querySelector(`[data-language=${value}]`).classList.add('active');
-      i18next.changeLanguage(value).then(initInterface);
-      break;
-    case 'modal':
-      modalLink.innerHTML = value.title;
-      modalLink.href = value.link;
-      modalDescription.innerHTML = value.description;
-      break;
-    // Формирую блок фидов
-    case 'feeds':
-      feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
-      break;
-    // Формирую блок постов
-    case 'posts':
-      posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml(value, 'posts')}</ul>`;
-      break;
-    default:
-      throw new Error('Unknown path');
-  }
+  return onChange(state, (path, value, previousValue) => {
+    if (value === previousValue || regExp.test(path)) return;
+
+    switch (path) {
+      case 'form.status':
+        if (value === 'sending') {
+          element.button.setAttribute('disabled', '');
+        }
+        if (value === 'input') {
+          element.button.removeAttribute('disabled');
+          element.inputField.value = '';
+        }
+        if (value === 'error') {
+          element.button.removeAttribute('disabled');
+        }
+        break;
+      case 'form.feedback':
+        element.feedback.textContent = value;
+        if (value === '') {
+          element.feedback.classList.remove('text-success', 'text-danger');
+          return;
+        }
+        if (value === i18next.t('message.successMessage')) {
+          element.feedback.classList.add('text-success');
+          return;
+        }
+        element.feedback.classList.add('text-danger');
+        break;
+      // Валидность формы
+      case 'form.valid':
+        if (value) {
+          element.inputField.classList.remove('is-invalid');
+          return;
+        }
+        element.inputField.classList.add('is-invalid');
+        break;
+      case 'language':
+        if (previousValue) {
+          document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
+        }
+        document.querySelector(`[data-language=${value}]`).classList.add('active');
+        i18next.changeLanguage(value).then(initInterface);
+        break;
+      case 'modal':
+        element.modalLink.innerHTML = value.title;
+        element.modalLink.href = value.link;
+        element.modalDescription.innerHTML = value.description;
+        break;
+      // Формирую блок фидов
+      case 'feeds':
+        element.feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
+        break;
+      // Формирую блок постов
+      case 'posts':
+        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml(value, 'posts')}</ul>`;
+        break;
+      default:
+        throw new Error('Unknown path');
+    }
+  });
 };
