@@ -66,7 +66,6 @@ const previewClick = (evt, state) => {
   const { title, description, link } = watchedState.posts.find((el) => el.id === id);
 
   watchedState.uiState.viewedPostIds = _.union(watchedState.uiState.viewedPostIds, [id]);
-  watchedState.posts = [...watchedState.posts];
   watchedState.uiState.modal = { title, description, link };
 };
 
