@@ -14,7 +14,6 @@ const addRss = (rssUrl, state) => {
   const url = `${config.proxy}/${rssUrl}`;
   watchedState.form.status = 'sending';
 
-  // Запрос с указанным урлом
   return axios.get(url)
     // Формирование списка Постов и Фидов
     .then((response) => {
@@ -84,7 +83,7 @@ const updateData = (evt, state) => {
 
   post.isViewed = true;
 
-  watchedState.modal = {
+  watchedState.uiState.modal = {
     title: post.title,
     description: post.description,
     link: post.link,
@@ -101,6 +100,14 @@ export default () => {
     .then(() => {
       // Модель стейта
       const state = {
+        uiState: {
+          language: '',
+          modal: {
+            title: '',
+            description: '',
+            link: '',
+          },
+        },
         form: {
           status: 'input',
           feedback: '',
@@ -108,15 +115,10 @@ export default () => {
         },
         feeds: [],
         posts: [],
-        language: '',
-        modal: {
-          title: '',
-          description: '',
-          link: '',
-        },
       };
 
       const element = {
+        form: document.querySelector('.rss-form'),
         feedback: document.querySelector('.feedback'),
         feeds: document.querySelector('.feeds'),
         posts: document.querySelector('.posts'),
@@ -124,19 +126,20 @@ export default () => {
         button: document.querySelector('#submit-button'),
         modalLink: document.querySelector('#modalLink'),
         modalDescription: document.querySelector('#postDescription'),
+        language: document.querySelector('#buttons'),
       };
 
       const watchedState = watch(state, element);
 
-      watchedState.language = config.defaultLanguage;
+      watchedState.uiState.language = config.defaultLanguage;
 
       // Отправка формы
-      document.querySelector('.rss-form').addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
+      element.form.addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
       // Открытие модального окна
-      document.querySelector('.posts').addEventListener('click', (evt) => updateData(evt, watchedState));
+      element.posts.addEventListener('click', (evt) => updateData(evt, watchedState));
       // Переключение языков
-      document.querySelector('#buttons').addEventListener('click', (evt) => {
-        watchedState.language = evt.target.dataset.language;
+      element.language.addEventListener('click', (evt) => {
+        watchedState.uiState.language = evt.target.dataset.language;
       });
 
       setTimeout(() => updateRss(watchedState), config.updateTime);

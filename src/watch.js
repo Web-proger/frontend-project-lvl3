@@ -76,14 +76,14 @@ export default (state, elementObject) => {
         }
         element.inputField.classList.add('is-invalid');
         break;
-      case 'language':
+      case 'uiState.language':
         if (previousValue) {
           document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
         }
         document.querySelector(`[data-language=${value}]`).classList.add('active');
         i18next.changeLanguage(value).then(initInterface);
         break;
-      case 'modal':
+      case 'uiState.modal':
         element.modalLink.innerHTML = value.title;
         element.modalLink.href = value.link;
         element.modalDescription.innerHTML = value.description;
