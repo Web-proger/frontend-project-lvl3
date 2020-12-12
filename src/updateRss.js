@@ -21,12 +21,7 @@ const updateRss = (state) => {
         const currentPosts = watchedState.posts.filter((post) => post.feedId === feed.id);
 
         return _.differenceWith(newPosts, currentPosts, (a, b) => a.title === b.title)
-          .map((post) => ({
-            ...post,
-            feedId: feed.id,
-            isViewed: false,
-            postId: _.uniqueId(),
-          }));
+          .map((post) => ({ id: _.uniqueId(), feedId: feed.id, ...post }));
       })
       .catch(() => []);
   });

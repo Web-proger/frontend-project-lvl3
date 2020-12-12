@@ -35,12 +35,7 @@ const handleSubmit = (evt, state) => {
     .then((response) => {
       const { posts, description, title } = parse(response.data);
       const feedId = _.uniqueId();
-      const rssPosts = posts.map((item) => ({
-        ...item,
-        feedId,
-        isViewed: false,
-        postId: _.uniqueId(),
-      }));
+      const rssPosts = posts.map((item) => ({ id: _.uniqueId(), feedId, ...item }));
 
       watchedState.form.state = 'success';
 
@@ -60,19 +55,15 @@ const handleSubmit = (evt, state) => {
 
 const updateData = (evt, state) => {
   const watchedState = state;
-  const previewId = evt.target.id;
-  const post = watchedState.posts.find((el) => el.postId === previewId);
 
-  if (post === 'undefined') return;
+  if (evt.target.tagName !== 'BUTTON') return;
 
-  post.isViewed = true;
+  const { id } = evt.target;
+  const { title, description, link } = watchedState.posts.find((el) => el.id === id);
 
-  watchedState.uiState.modal = {
-    title: post.title,
-    description: post.description,
-    link: post.link,
-  };
+  watchedState.uiState.viewedPostIds = _.union(watchedState.uiState.viewedPostIds, [id]);
   watchedState.posts = [...watchedState.posts];
+  watchedState.uiState.modal = { title, description, link };
 };
 
 export default () => {
@@ -91,6 +82,7 @@ export default () => {
             description: '',
             link: '',
           },
+          viewedPostIds: [],
         },
         form: {
           state: 'idle',
@@ -117,7 +109,6 @@ export default () => {
 
       watchedState.uiState.language = config.defaultLanguage;
 
-      // Отправка формы
       element.form.addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
       // Открытие модального окна
       element.posts.addEventListener('click', (evt) => updateData(evt, watchedState));

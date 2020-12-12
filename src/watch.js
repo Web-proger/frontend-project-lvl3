@@ -12,11 +12,11 @@ const getHtml = (data, type) => {
         .map(({
           link,
           title,
-          postId,
+          id,
           isViewed,
         }) => (`
             <li class="list-group-item ${isViewed ? 'font-weight-normal' : 'font-weight-bold'}">
-                <button id="${postId}" type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#modal">View</button>
+                <button id="${id}" type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#modal">View</button>
                 <a href="${link}">${title}</a>
             </li>
         `))
@@ -93,6 +93,8 @@ export default (state, elementObject) => {
         element.modalLink.href = value.link;
         element.modalDescription.innerHTML = value.description;
         break;
+      case 'uiState.viewedPostIds':
+        return;
       case 'feeds':
         element.feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
         break;
