@@ -57,7 +57,7 @@ const handleSubmit = (evt, state) => {
     });
 };
 
-const updateData = (evt, state) => {
+const previewClick = (evt, state) => {
   const watchedState = state;
 
   if (evt.target.tagName !== 'BUTTON') return;
@@ -115,7 +115,7 @@ export default () => {
 
       element.form.addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
       // Открытие модального окна
-      element.posts.addEventListener('click', (evt) => updateData(evt, watchedState));
+      element.posts.addEventListener('click', (evt) => previewClick(evt, watchedState));
       // Переключение языков
       element.language.addEventListener('click', (evt) => {
         watchedState.uiState.language = evt.target.dataset.language;

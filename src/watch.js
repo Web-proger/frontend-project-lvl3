@@ -8,18 +8,16 @@ const getHtml = (data, type) => {
         .map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`))
         .join('');
     case 'posts':
-      return data
-        .map(({
-          link,
-          title,
-          id,
-          isViewed,
-        }) => (`
+      return data.value
+        .map(({ link, title, id }) => {
+          const isViewed = data.viewedPostIds.includes(id);
+          return (`
             <li class="list-group-item ${isViewed ? 'font-weight-normal' : 'font-weight-bold'}">
                 <button id="${id}" type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#modal">View</button>
                 <a href="${link}">${title}</a>
             </li>
-        `))
+          `);
+        })
         .join('');
     case 'errors':
       return data.map((name) => {
@@ -99,7 +97,7 @@ export default (state, elementObject) => {
         element.feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
         break;
       case 'posts':
-        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml(value, 'posts')}</ul>`;
+        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml({ value, viewedPostIds: state.uiState.viewedPostIds }, 'posts')}</ul>`;
         break;
       default:
         throw new Error(`Unknown path ${path}`);
