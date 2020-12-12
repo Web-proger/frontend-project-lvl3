@@ -69,7 +69,7 @@ export default (state, elementObject) => {
         element.feedback.classList.add('text-danger');
         break;
       // Валидность формы
-      case 'form.valid':
+      case 'form.isValid':
         if (value) {
           element.inputField.classList.remove('is-invalid');
           return;

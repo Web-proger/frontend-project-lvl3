@@ -8,13 +8,29 @@ import updateRss from './updateRss';
 import parse from './parser';
 import config from './config';
 
-const addRss = (rssUrl, state) => {
+const handleSubmit = (evt, state) => {
+  evt.preventDefault();
   const watchedState = state;
+  const urlSchema = string().url();
+  watchedState.form.feedback = '';
 
+  const formData = new FormData(evt.target);
+  const rssUrl = formData.get('rss-input');
   const url = `${config.proxy}/${rssUrl}`;
-  watchedState.form.status = 'sending';
 
-  return axios.get(url)
+  urlSchema.isValid(rssUrl)
+    // Валидность и уникальность ссылки
+    .then((valid) => {
+      watchedState.form.isValid = valid;
+      if (!valid) throw new Error(i18next.t('message.noValidUrl'));
+
+      const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
+      watchedState.form.isValid = isLinkUnique;
+      if (!isLinkUnique) throw new Error(i18next.t('message.urlExists'));
+
+      watchedState.form.status = 'sending';
+      return axios.get(url)
+    })
     // Формирование списка Постов и Фидов
     .then((response) => {
       const { posts, description, title } = parse(response.data);
@@ -38,40 +54,9 @@ const addRss = (rssUrl, state) => {
       watchedState.posts.unshift(...rssPosts);
     })
     .catch((err) => {
-      watchedState.feedback = err.message;
-      watchedState.status = 'error';
-    });
-};
-
-const handleSubmit = (evt, state) => {
-  evt.preventDefault();
-  const watchedState = state;
-  const urlSchema = string().url();
-  watchedState.form.feedback = '';
-
-  const formData = new FormData(evt.target);
-  const rssUrl = formData.get('rss-input');
-
-  urlSchema.isValid(rssUrl)
-    // Валидность ссылки
-    .then((valid) => {
-      watchedState.form.valid = valid;
-      if (!valid) {
-        throw new Error(i18next.t('message.noValidUrl'));
-      }
-    })
-    // Уникальность ссылки
-    .then(() => {
-      const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
-      watchedState.form.valid = isLinkUnique;
-      if (!isLinkUnique) throw new Error(i18next.t('message.urlExists'));
-
-      return addRss(rssUrl, watchedState);
-    })
-    .catch((err) => {
       watchedState.form.feedback = err.message;
       watchedState.form.status = 'error';
-    });
+    })
 };
 
 const updateData = (evt, state) => {
@@ -109,9 +94,9 @@ export default () => {
           },
         },
         form: {
+          isValid: false,
           status: 'input',
           feedback: '',
-          valid: true,
         },
         feeds: [],
         posts: [],
