@@ -41,10 +41,8 @@ const initInterface = () => {
 export default (state, elementObject) => {
   const element = elementObject;
 
-  const regExp = RegExp(/^posts.\d+.isViewed$/);
-
   return onChange(state, (path, value, previousValue) => {
-    if (value === previousValue || regExp.test(path)) return;
+    if (value === previousValue) return;
 
     switch (path) {
       case 'form.state':
