@@ -1,6 +1,6 @@
 import i18next from 'i18next';
 import axios from 'axios';
-import { string } from 'yup';
+import { string, mixed } from 'yup';
 import _ from 'lodash';
 import watch from './watch';
 import resources from './locales';
@@ -11,22 +11,26 @@ import config from './config';
 const handleSubmit = (evt, state) => {
   evt.preventDefault();
   const watchedState = state;
-  const urlSchema = string().url();
   watchedState.form.errors = [];
+
+  const feedLinks = watchedState.feeds.map((feed) => feed.link);
+  const urlUniqueSchema = mixed().notOneOf(feedLinks);
+  const urlSchema = string().url();
 
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
   const url = `${config.proxy}/${rssUrl}`;
 
   urlSchema.isValid(rssUrl)
-    // Валидность и уникальность ссылки
     .then((valid) => {
       watchedState.form.isValid = valid;
       if (!valid) throw new Error('noValidUrl');
 
-      const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
-      watchedState.form.isValid = isLinkUnique;
-      if (!isLinkUnique) throw new Error('urlExists');
+      return urlUniqueSchema.isValid(rssUrl);
+    })
+    .then((valid) => {
+      watchedState.form.isValid = valid;
+      if (!valid) throw new Error('urlExists');
 
       watchedState.form.state = 'fetching';
       return axios.get(url);
