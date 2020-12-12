@@ -7,30 +7,25 @@ import config from './config';
 const updateRss = (state) => {
   const watchedState = state;
 
-  const promises = watchedState.feeds.map((feed) => {
-    const url = `${config.proxy}/${feed.link}`;
+  const promises = watchedState.feeds.map((feed) => axios.get(`${config.proxy}/${feed.link}`));
 
-    return axios.get(url)
-      .then((response) => {
-        const { posts: newPosts } = parse(response.data);
-
+  Promise.all(promises)
+    .then((responses) => {
+      const uniquePosts = responses.map((response, i) => {
+        const feed = watchedState.feeds[i];
+        const newPosts = parse(response.data).posts;
         const oldPosts = watchedState.posts.filter((post) => post.feedId === feed.id);
 
         return _.differenceWith(newPosts, oldPosts, (a, b) => a.title === b.title)
           .map((post) => ({ id: _.uniqueId(), feedId: feed.id, ...post }));
-      })
-      .catch((err) => {
-        console.log(err.message);
-        return [];
       });
-  });
 
-  Promise.all(promises)
-    .then((newPosts) => {
-      watchedState.posts.unshift(...newPosts.flat());
+      if (_.isEmpty(uniquePosts)) return;
+
+      watchedState.posts.unshift(...uniquePosts.flat());
     })
     .catch((err) => {
-      throw new Error(err.message)
+      throw new Error(err.message);
     })
     .finally(() => {
       setTimeout(() => updateRss(watchedState), config.updateTime);
