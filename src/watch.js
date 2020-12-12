@@ -21,8 +21,13 @@ const getHtml = (data, type) => {
             </li>
         `))
         .join('');
+    case 'errors':
+      return data.map((name) => {
+        const message = i18next.t(`message.${name}`) === `message.${name}` ? name : i18next.t(`message.${name}`);
+        return (`<div>${message}</div>`);
+      }).join('');
     default:
-      throw new Error(i18next.t('message.successMessage'));
+      throw new Error(`unknownType ${type}`);
   }
 };
 
@@ -44,37 +49,37 @@ export default (state, elementObject) => {
     if (value === previousValue || regExp.test(path)) return;
 
     switch (path) {
-      case 'form.status':
-        if (value === 'sending') {
-          element.button.setAttribute('disabled', '');
-        }
-        if (value === 'input') {
+      case 'form.state':
+        if (value === 'idle') {
           element.button.removeAttribute('disabled');
           element.inputField.value = '';
+          element.message.classList.remove('text-success', 'text-danger');
         }
-        if (value === 'error') {
+        if (value === 'fetching') {
+          element.button.setAttribute('disabled', '');
+        }
+        if (value === 'success') {
           element.button.removeAttribute('disabled');
+          element.inputField.value = '';
+          element.message.textContent = i18next.t('message.successMessage');
+          element.message.classList.remove('text-danger');
+          element.message.classList.add('text-success');
+        }
+        if (value === 'failure') {
+          element.button.removeAttribute('disabled');
+          element.message.classList.add('text-danger');
+          element.message.classList.remove('text-success');
         }
         break;
-      case 'form.feedback':
-        element.feedback.textContent = value;
-        if (value === '') {
-          element.feedback.classList.remove('text-success', 'text-danger');
-          return;
-        }
-        if (value === i18next.t('message.successMessage')) {
-          element.feedback.classList.add('text-success');
-          return;
-        }
-        element.feedback.classList.add('text-danger');
-        break;
-      // Валидность формы
       case 'form.isValid':
         if (value) {
           element.inputField.classList.remove('is-invalid');
           return;
         }
         element.inputField.classList.add('is-invalid');
+        break;
+      case 'form.errors':
+        element.message.innerHTML = `${getHtml(value, 'errors')}`;
         break;
       case 'uiState.language':
         if (previousValue) {
@@ -88,16 +93,14 @@ export default (state, elementObject) => {
         element.modalLink.href = value.link;
         element.modalDescription.innerHTML = value.description;
         break;
-      // Формирую блок фидов
       case 'feeds':
         element.feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
         break;
-      // Формирую блок постов
       case 'posts':
         element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml(value, 'posts')}</ul>`;
         break;
       default:
-        throw new Error('Unknown path');
+        throw new Error(`Unknown path ${path}`);
     }
   });
 };

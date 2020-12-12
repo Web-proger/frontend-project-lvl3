@@ -12,7 +12,7 @@ const handleSubmit = (evt, state) => {
   evt.preventDefault();
   const watchedState = state;
   const urlSchema = string().url();
-  watchedState.form.feedback = '';
+  watchedState.form.errors = [];
 
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
@@ -22,14 +22,14 @@ const handleSubmit = (evt, state) => {
     // Валидность и уникальность ссылки
     .then((valid) => {
       watchedState.form.isValid = valid;
-      if (!valid) throw new Error(i18next.t('message.noValidUrl'));
+      if (!valid) throw new Error('noValidUrl');
 
       const isLinkUnique = watchedState.feeds.filter((el) => el.link === rssUrl).length === 0;
       watchedState.form.isValid = isLinkUnique;
-      if (!isLinkUnique) throw new Error(i18next.t('message.urlExists'));
+      if (!isLinkUnique) throw new Error('urlExists');
 
-      watchedState.form.status = 'sending';
-      return axios.get(url)
+      watchedState.form.state = 'fetching';
+      return axios.get(url);
     })
     // Формирование списка Постов и Фидов
     .then((response) => {
@@ -42,8 +42,7 @@ const handleSubmit = (evt, state) => {
         postId: _.uniqueId(),
       }));
 
-      watchedState.form.status = 'input';
-      watchedState.form.feedback = i18next.t('message.successMessage');
+      watchedState.form.state = 'success';
 
       watchedState.feeds.unshift({
         title,
@@ -54,9 +53,9 @@ const handleSubmit = (evt, state) => {
       watchedState.posts.unshift(...rssPosts);
     })
     .catch((err) => {
-      watchedState.form.feedback = err.message;
-      watchedState.form.status = 'error';
-    })
+      watchedState.form.errors = [err.message];
+      watchedState.form.state = 'failure';
+    });
 };
 
 const updateData = (evt, state) => {
@@ -94,9 +93,9 @@ export default () => {
           },
         },
         form: {
+          state: 'idle',
           isValid: false,
-          status: 'input',
-          feedback: '',
+          errors: [],
         },
         feeds: [],
         posts: [],
@@ -104,7 +103,7 @@ export default () => {
 
       const element = {
         form: document.querySelector('.rss-form'),
-        feedback: document.querySelector('.feedback'),
+        message: document.querySelector('.feedback'),
         feeds: document.querySelector('.feeds'),
         posts: document.querySelector('.posts'),
         inputField: document.querySelector('[name=rss-input]'),
