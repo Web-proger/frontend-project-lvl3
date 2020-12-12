@@ -4,21 +4,15 @@ import i18next from 'i18next';
 const getHtml = (data, type) => {
   switch (type) {
     case 'feeds':
-      return data
-        .map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`))
-        .join('');
+      return data.map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`)).join('');
     case 'posts':
-      return data.posts
-        .map(({ link, title, id }) => {
-          const isViewed = data.viewedPostIds.includes(id);
-          return (`
-            <li class="list-group-item ${isViewed ? 'font-weight-normal' : 'font-weight-bold'}">
-                <button id="${id}" type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#modal">View</button>
-                <a href="${link}">${title}</a>
-            </li>
-          `);
-        })
-        .join('');
+      return data.posts.map(({ link, title, id }) => {
+        const isViewed = data.viewedPostIds.includes(id);
+        return (`<li class="list-group-item ${isViewed ? 'font-weight-normal' : 'font-weight-bold'}">
+                   <button id="${id}" type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#modal">View</button>
+                   <a href="${link}">${title}</a>
+                 </li>`);
+      }).join('');
     case 'errors':
       return data.map((name) => {
         const message = i18next.t(`message.${name}`) === `message.${name}` ? name : i18next.t(`message.${name}`);
