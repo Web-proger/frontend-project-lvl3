@@ -6,10 +6,6 @@ import config from './config';
 
 const updateRss = (state) => {
   const watchedState = state;
-  if (watchedState.feeds.length === 0) {
-    setTimeout(() => updateRss(watchedState), config.updateTime);
-    return;
-  }
 
   const promises = watchedState.feeds.map((feed) => {
     const url = `${config.proxy}/${feed.link}`;
@@ -18,19 +14,25 @@ const updateRss = (state) => {
       .then((response) => {
         const { posts: newPosts } = parse(response.data);
 
-        const currentPosts = watchedState.posts.filter((post) => post.feedId === feed.id);
+        const oldPosts = watchedState.posts.filter((post) => post.feedId === feed.id);
 
-        return _.differenceWith(newPosts, currentPosts, (a, b) => a.title === b.title)
+        return _.differenceWith(newPosts, oldPosts, (a, b) => a.title === b.title)
           .map((post) => ({ id: _.uniqueId(), feedId: feed.id, ...post }));
       })
-      .catch(() => []);
+      .catch((err) => {
+        console.log(err.message);
+        return [];
+      });
   });
 
   Promise.all(promises)
     .then((newPosts) => {
       watchedState.posts.unshift(...newPosts.flat());
     })
-    .then(() => {
+    .catch((err) => {
+      throw new Error(err.message)
+    })
+    .finally(() => {
       setTimeout(() => updateRss(watchedState), config.updateTime);
     });
 };
