@@ -7,7 +7,11 @@ import config from './config';
 const updateRss = (state) => {
   const watchedState = state;
 
-  const promises = watchedState.feeds.map((feed) => axios.get(`${config.proxy}/${feed.link}`));
+  const promises = watchedState.feeds.map((feed) => axios.get(`${config.proxy}/${feed.link}`)
+    .catch((err) => {
+      console.log(err.message);
+      return [];
+    }));
 
   Promise.all(promises)
     .then((responses) => {
