@@ -78,10 +78,11 @@ export default (state, elementObject) => {
         document.querySelector(`[data-language=${value}]`).classList.add('active');
         i18next.changeLanguage(value).then(initInterface);
         break;
-      case 'uiState.modal':
-        element.modalLink.innerHTML = value.title;
-        element.modalLink.href = value.link;
-        element.modalDescription.innerHTML = value.description;
+      case 'uiState.previewPostId':
+        const { title, description, link } = state.posts.find((el) => el.id === value);
+        element.modalLink.innerHTML = title;
+        element.modalLink.href = link;
+        element.modalDescription.innerHTML = description;
         break;
       case 'uiState.viewedPostIds':
         element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml({ posts: state.posts, viewedPostIds: value }, 'posts')}</ul>`;

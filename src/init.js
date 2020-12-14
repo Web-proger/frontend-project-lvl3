@@ -63,10 +63,9 @@ const previewClick = (evt, state) => {
   if (evt.target.tagName !== 'BUTTON') return;
 
   const { id } = evt.target;
-  const { title, description, link } = watchedState.posts.find((el) => el.id === id);
 
   watchedState.uiState.viewedPostIds = _.union(watchedState.uiState.viewedPostIds, [id]);
-  watchedState.uiState.modal = { title, description, link };
+  watchedState.uiState.previewPostId = id;
 };
 
 export default () => {
@@ -80,11 +79,7 @@ export default () => {
       const state = {
         uiState: {
           language: '',
-          modal: {
-            title: '',
-            description: '',
-            link: '',
-          },
+          previewPostId: '',
           viewedPostIds: [],
         },
         form: {

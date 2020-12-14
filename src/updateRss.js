@@ -13,7 +13,7 @@ const updateRss = (state) => {
     .then((responses) => {
       const uniquePosts = responses.map((response, i) => {
         const feed = watchedState.feeds[i];
-        const newPosts = parse(response.data).posts;
+        const { posts: newPosts } = parse(response.data);
         const oldPosts = watchedState.posts.filter((post) => post.feedId === feed.id);
 
         return _.differenceWith(newPosts, oldPosts, (a, b) => a.title === b.title)
