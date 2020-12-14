@@ -32,7 +32,7 @@ const handleSubmit = (evt, state) => {
       watchedState.form.isValid = valid;
       if (!valid) throw new Error('urlExists');
 
-      watchedState.form.state = 'fetching';
+      watchedState.loadState = 'fetching';
       return axios.get(url);
     })
     // Формирование списка Постов и Фидов
@@ -41,7 +41,7 @@ const handleSubmit = (evt, state) => {
       const feedId = _.uniqueId();
       const rssPosts = posts.map((item) => ({ id: _.uniqueId(), feedId, ...item }));
 
-      watchedState.form.state = 'success';
+      watchedState.loadState = 'success';
 
       watchedState.feeds.unshift({
         title,
@@ -53,7 +53,7 @@ const handleSubmit = (evt, state) => {
     })
     .catch((err) => {
       watchedState.form.errors = [err.message];
-      watchedState.form.state = 'failure';
+      watchedState.loadState = 'failure';
     });
 };
 
@@ -83,10 +83,10 @@ export default () => {
           viewedPostIds: [],
         },
         form: {
-          state: 'idle',
           isValid: false,
           errors: [],
         },
+        loadState: 'idle',
         feeds: [],
         posts: [],
       };

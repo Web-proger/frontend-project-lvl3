@@ -39,7 +39,7 @@ export default (state, elementObject) => {
     if (value === previousValue) return;
 
     switch (path) {
-      case 'form.state':
+      case 'loadState':
         if (value === 'idle') {
           element.button.removeAttribute('disabled');
           element.inputField.value = '';
