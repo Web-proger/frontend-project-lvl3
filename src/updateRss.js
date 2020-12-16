@@ -22,9 +22,6 @@ const updateRss = (state) => {
     }));
 
   Promise.all(promises)
-    .catch((err) => {
-      throw new Error(err.message);
-    })
     .finally(() => {
       setTimeout(() => updateRss(watchedState), config.updateTime);
     });
