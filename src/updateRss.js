@@ -12,18 +12,16 @@ const updateRss = (state) => {
       const { posts: newPosts } = parse(response.data);
       const oldPosts = watchedState.posts.filter((post) => post.feedId === feed.id);
 
-      return _.differenceWith(newPosts, oldPosts, (a, b) => a.title === b.title)
+      const uniquePosts = _.differenceWith(newPosts, oldPosts, (a, b) => a.title === b.title)
         .map((post) => ({ id: _.uniqueId(), feedId: feed.id, ...post }));
+      if (_.isEmpty(uniquePosts)) return;
+      watchedState.posts.unshift(...uniquePosts);
     })
     .catch((err) => {
       console.log(err.message);
-      return [];
     }));
 
   Promise.all(promises)
-    .then((posts) => {
-      watchedState.posts.unshift(...posts.flat());
-    })
     .catch((err) => {
       throw new Error(err.message);
     })
