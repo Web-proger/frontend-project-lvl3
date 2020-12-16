@@ -1,6 +1,6 @@
 import i18next from 'i18next';
 import axios from 'axios';
-import { string, mixed } from 'yup';
+import { string } from 'yup';
 import _ from 'lodash';
 import watch from './watch';
 import resources from './locales';
@@ -8,33 +8,38 @@ import updateRss from './updateRss';
 import parse from './parser';
 import config from './config';
 
+const validateUrl = (url, state) => {
+  const watchedState = state;
+  const feedUrls = watchedState.feeds.map((feed) => feed.link);
+
+  try {
+    const urlSchema = string().url('noValidUrl').required().notOneOf(feedUrls, 'urlExists');
+    urlSchema.validateSync(url);
+    watchedState.form.isValid = true;
+    return true;
+  } catch (err) {
+    watchedState.form.errors = [err.message];
+    watchedState.form.isValid = false;
+    watchedState.loadState = 'failure';
+    return false;
+  }
+};
+
 const handleSubmit = (evt, state) => {
   evt.preventDefault();
   const watchedState = state;
   watchedState.form.errors = [];
 
-  const feedLinks = watchedState.feeds.map((feed) => feed.link);
-  const urlUniqueSchema = mixed().notOneOf(feedLinks);
-  const urlSchema = string().url();
-
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
   const url = `${config.proxy}/${rssUrl}`;
 
-  urlSchema.isValid(rssUrl)
-    .then((valid) => {
-      watchedState.form.isValid = valid;
-      if (!valid) throw new Error('noValidUrl');
+  const isValidUrl = validateUrl(rssUrl, state);
+  if (!isValidUrl) return;
 
-      return urlUniqueSchema.isValid(rssUrl);
-    })
-    .then((valid) => {
-      watchedState.form.isValid = valid;
-      if (!valid) throw new Error('urlExists');
+  watchedState.loadState = 'fetching';
 
-      watchedState.loadState = 'fetching';
-      return axios.get(url);
-    })
+  axios.get(url)
     // Формирование списка Постов и Фидов
     .then((response) => {
       const { posts, description, title } = parse(response.data);
