@@ -9,13 +9,8 @@ import parse from './parser';
 import config from './config';
 
 const validateUrl = (url, urls) => {
-  try {
-    const urlSchema = string().url('noValidUrl').required().notOneOf(urls, 'urlExists');
-    urlSchema.validateSync(url);
-    return { isValid: true };
-  } catch (error) {
-    return { isValid: false, error };
-  }
+  const urlSchema = string().url('noValidUrl').required().notOneOf(urls, 'urlExists');
+  urlSchema.validateSync(url);
 };
 
 const handleSubmit = (evt, state) => {
@@ -28,24 +23,24 @@ const handleSubmit = (evt, state) => {
   const feedUrls = watchedState.feeds.map((feed) => feed.link);
   const url = `${config.proxy}/${rssUrl}`;
 
-  const data = validateUrl(rssUrl, feedUrls);
-  if (!data.isValid) {
+  try {
+    validateUrl(rssUrl, feedUrls);
+    watchedState.form.isValid = true;
+  } catch (err) {
     watchedState.form.isValid = false;
-    watchedState.form.errors = [data.error.message];
+    watchedState.form.errors = [err.message];
     return;
   }
 
-  watchedState.form.isValid = true;
-  watchedState.loadState = 'fetching';
+  watchedState.loading.state = 'fetching';
 
   axios.get(url)
-    // Формирование списка Постов и Фидов
     .then((response) => {
       const { posts, description, title } = parse(response.data);
       const feedId = _.uniqueId();
       const rssPosts = posts.map((item) => ({ id: _.uniqueId(), feedId, ...item }));
 
-      watchedState.loadState = 'success';
+      watchedState.loading.state = 'success';
 
       watchedState.feeds.unshift({
         title,
@@ -57,7 +52,7 @@ const handleSubmit = (evt, state) => {
     })
     .catch((err) => {
       watchedState.form.errors = [err.message];
-      watchedState.loadState = 'failure';
+      watchedState.loading.state = 'failure';
     });
 };
 
@@ -79,7 +74,6 @@ export default () => {
     resources,
   })
     .then(() => {
-      // Модель стейта
       const state = {
         uiState: {
           language: '',
@@ -90,7 +84,10 @@ export default () => {
           isValid: false,
           errors: [],
         },
-        loadState: 'idle',
+        loading: {
+          state: 'idle',
+          errors: [],
+        },
         feeds: [],
         posts: [],
       };
@@ -112,9 +109,7 @@ export default () => {
       watchedState.uiState.language = config.defaultLanguage;
 
       element.form.addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
-      // Открытие модального окна
       element.posts.addEventListener('click', (evt) => previewClick(evt, watchedState));
-      // Переключение языков
       element.language.addEventListener('click', (evt) => {
         watchedState.uiState.language = evt.target.dataset.language;
       });

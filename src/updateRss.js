@@ -1,4 +1,3 @@
-// Обновление RSS с определенным интервалом
 import axios from 'axios';
 import _ from 'lodash';
 import parse from './parser';
