@@ -56,13 +56,13 @@ export default (state, elementObject) => {
           element.message.classList.add('text-success');
         }
         if (value === 'failure') {
+          element.message.innerHTML = `${getHtml(state.loading.errors, 'errors')}`;
           element.button.removeAttribute('disabled');
           element.message.classList.add('text-danger');
           element.message.classList.remove('text-success');
         }
         break;
       case 'loading.errors':
-        element.message.innerHTML = `${getHtml(value, 'errors')}`;
         break;
       case 'form.isValid':
         if (value) {
@@ -71,12 +71,12 @@ export default (state, elementObject) => {
           element.message.classList.add('text-success');
           return;
         }
+        element.message.innerHTML = `${getHtml(state.form.errors, 'errors')}`;
         element.inputField.classList.add('is-invalid');
         element.message.classList.add('text-danger');
         element.message.classList.remove('text-success');
         break;
       case 'form.errors':
-        element.message.innerHTML = `${getHtml(value, 'errors')}`;
         break;
       case 'uiState.language':
         if (previousValue) {

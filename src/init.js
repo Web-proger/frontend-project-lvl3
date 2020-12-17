@@ -28,8 +28,8 @@ const handleSubmit = (evt, state) => {
     validateUrl(rssUrl, feedUrls);
     watchedState.form.isValid = true;
   } catch (err) {
-    watchedState.form.isValid = false;
     watchedState.form.errors = [err.message];
+    watchedState.form.isValid = false;
     return;
   }
 
@@ -74,7 +74,7 @@ export default () => {
     debug: false,
     resources,
   })
-    .then(() => {
+    .then((promise) => {
       const state = {
         uiState: {
           language: null,
@@ -116,7 +116,6 @@ export default () => {
       });
 
       setTimeout(() => updateRss(watchedState), config.updateTime);
-
-      return 'success init';
+      return promise;
     });
 };
