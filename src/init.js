@@ -17,6 +17,7 @@ const handleSubmit = (evt, state) => {
   evt.preventDefault();
   const watchedState = state;
   watchedState.form.errors = [];
+  watchedState.loading.errors = [];
 
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
@@ -51,7 +52,7 @@ const handleSubmit = (evt, state) => {
       watchedState.posts.unshift(...rssPosts);
     })
     .catch((err) => {
-      watchedState.form.errors = [err.message];
+      watchedState.loading.errors = [err.message];
       watchedState.loading.state = 'failure';
     });
 };
@@ -76,12 +77,12 @@ export default () => {
     .then(() => {
       const state = {
         uiState: {
-          language: '',
-          previewPostId: '',
+          language: null,
+          previewPostId: null,
           viewedPostIds: [],
         },
         form: {
-          isValid: false,
+          isValid: null,
           errors: [],
         },
         loading: {

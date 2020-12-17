@@ -61,6 +61,9 @@ export default (state, elementObject) => {
           element.message.classList.remove('text-success');
         }
         break;
+      case 'loading.errors':
+        element.message.innerHTML = `${getHtml(value, 'errors')}`;
+        break;
       case 'form.isValid':
         if (value) {
           element.inputField.classList.remove('is-invalid');
