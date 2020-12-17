@@ -8,20 +8,13 @@ import updateRss from './updateRss';
 import parse from './parser';
 import config from './config';
 
-const validateUrl = (url, state) => {
-  const watchedState = state;
-  const feedUrls = watchedState.feeds.map((feed) => feed.link);
-
+const validateUrl = (url, urls) => {
   try {
-    const urlSchema = string().url('noValidUrl').required().notOneOf(feedUrls, 'urlExists');
+    const urlSchema = string().url('noValidUrl').required().notOneOf(urls, 'urlExists');
     urlSchema.validateSync(url);
-    watchedState.form.isValid = true;
-    return true;
-  } catch (err) {
-    watchedState.form.errors = [err.message];
-    watchedState.form.isValid = false;
-    watchedState.loadState = 'failure';
-    return false;
+    return { isValid: true };
+  } catch (error) {
+    return { isValid: false, error };
   }
 };
 
@@ -32,11 +25,17 @@ const handleSubmit = (evt, state) => {
 
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
+  const feedUrls = watchedState.feeds.map((feed) => feed.link);
   const url = `${config.proxy}/${rssUrl}`;
 
-  const isValidUrl = validateUrl(rssUrl, state);
-  if (!isValidUrl) return;
+  const data = validateUrl(rssUrl, feedUrls);
+  if (!data.isValid) {
+    watchedState.form.isValid = false;
+    watchedState.form.errors = [data.error.message];
+    return;
+  }
 
+  watchedState.form.isValid = true;
   watchedState.loadState = 'fetching';
 
   axios.get(url)

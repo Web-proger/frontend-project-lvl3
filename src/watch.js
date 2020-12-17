@@ -64,9 +64,13 @@ export default (state, elementObject) => {
       case 'form.isValid':
         if (value) {
           element.inputField.classList.remove('is-invalid');
+          element.message.classList.remove('text-danger');
+          element.message.classList.add('text-success');
           return;
         }
         element.inputField.classList.add('is-invalid');
+        element.message.classList.add('text-danger');
+        element.message.classList.remove('text-success');
         break;
       case 'form.errors':
         element.message.innerHTML = `${getHtml(value, 'errors')}`;
