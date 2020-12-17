@@ -32,6 +32,54 @@ const initInterface = () => {
   document.querySelector('#footer-link-text').innerHTML = i18next.t('footerLinkText');
 };
 
+const paintLoading = (status, elementObject, state) => {
+  const element = elementObject;
+  switch (status) {
+    case 'idle':
+      element.button.removeAttribute('disabled');
+      element.inputField.value = '';
+      element.message.classList.remove('text-success', 'text-danger');
+      break;
+    case 'fetching':
+      element.button.setAttribute('disabled', '');
+      break;
+    case 'success':
+      element.button.removeAttribute('disabled');
+      element.inputField.value = '';
+      element.message.textContent = i18next.t('message.successMessage');
+      element.message.classList.remove('text-danger');
+      element.message.classList.add('text-success');
+      break;
+    case 'failure':
+      element.message.innerHTML = `${getHtml(state.loading.errors, 'errors')}`;
+      element.button.removeAttribute('disabled');
+      element.message.classList.add('text-danger');
+      element.message.classList.remove('text-success');
+      break;
+    default:
+      throw new Error(`Unknown status ${status}`);
+  }
+};
+
+const paintForm = (valid, elementObject, state) => {
+  const element = elementObject;
+  switch (valid) {
+    case true:
+      element.inputField.classList.remove('is-invalid');
+      element.message.classList.remove('text-danger');
+      element.message.classList.add('text-success');
+      break;
+    case false:
+      element.message.innerHTML = `${getHtml(state.form.errors, 'errors')}`;
+      element.inputField.classList.add('is-invalid');
+      element.message.classList.add('text-danger');
+      element.message.classList.remove('text-success');
+      break;
+    default:
+      throw new Error(`Unknown value ${valid}`);
+  }
+};
+
 export default (state, elementObject) => {
   const element = elementObject;
 
@@ -40,41 +88,12 @@ export default (state, elementObject) => {
 
     switch (path) {
       case 'loading.state':
-        if (value === 'idle') {
-          element.button.removeAttribute('disabled');
-          element.inputField.value = '';
-          element.message.classList.remove('text-success', 'text-danger');
-        }
-        if (value === 'fetching') {
-          element.button.setAttribute('disabled', '');
-        }
-        if (value === 'success') {
-          element.button.removeAttribute('disabled');
-          element.inputField.value = '';
-          element.message.textContent = i18next.t('message.successMessage');
-          element.message.classList.remove('text-danger');
-          element.message.classList.add('text-success');
-        }
-        if (value === 'failure') {
-          element.message.innerHTML = `${getHtml(state.loading.errors, 'errors')}`;
-          element.button.removeAttribute('disabled');
-          element.message.classList.add('text-danger');
-          element.message.classList.remove('text-success');
-        }
+        paintLoading(value, element, state);
         break;
       case 'loading.errors':
         break;
       case 'form.isValid':
-        if (value) {
-          element.inputField.classList.remove('is-invalid');
-          element.message.classList.remove('text-danger');
-          element.message.classList.add('text-success');
-          return;
-        }
-        element.message.innerHTML = `${getHtml(state.form.errors, 'errors')}`;
-        element.inputField.classList.add('is-invalid');
-        element.message.classList.add('text-danger');
-        element.message.classList.remove('text-success');
+        paintForm(value, element, state);
         break;
       case 'form.errors':
         break;
