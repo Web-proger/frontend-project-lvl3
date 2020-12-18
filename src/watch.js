@@ -75,6 +75,8 @@ const paintForm = (valid, elementObject, state) => {
       element.message.classList.add('text-danger');
       element.message.classList.remove('text-success');
       break;
+    case null:
+      break;
     default:
       throw new Error(`Unknown value ${valid}`);
   }
@@ -84,18 +86,12 @@ export default (state, elementObject) => {
   const element = elementObject;
 
   return onChange(state, (path, value, previousValue) => {
-    if (value === previousValue) return;
-
     switch (path) {
       case 'loading.state':
         paintLoading(value, element, state);
         break;
-      case 'loading.errors':
-        break;
       case 'form.isValid':
         paintForm(value, element, state);
-        break;
-      case 'form.errors':
         break;
       case 'uiState.language':
         if (previousValue) {
@@ -123,5 +119,5 @@ export default (state, elementObject) => {
       default:
         throw new Error(`Unknown path ${path}`);
     }
-  });
+  }, { ignoreKeys: ['errors'] });
 };

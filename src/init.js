@@ -16,17 +16,16 @@ const validateUrl = (url, urls) => {
 const handleSubmit = (evt, state) => {
   evt.preventDefault();
   const watchedState = state;
-  watchedState.form.errors = [];
-  watchedState.loading.errors = [];
 
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
   const feedUrls = watchedState.feeds.map((feed) => feed.link);
   const url = `${config.proxy}/${rssUrl}`;
 
+  watchedState.form.isValid = null;
+
   try {
     validateUrl(rssUrl, feedUrls);
-    watchedState.form.isValid = true;
   } catch (err) {
     watchedState.form.errors = [err.message];
     watchedState.form.isValid = false;
