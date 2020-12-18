@@ -22,13 +22,11 @@ const handleSubmit = (evt, state) => {
   const feedUrls = watchedState.feeds.map((feed) => feed.link);
   const url = `${config.proxy}/${rssUrl}`;
 
-  watchedState.form.isValid = null;
-
   try {
     validateUrl(rssUrl, feedUrls);
+    watchedState.form = { isValid: true, errors: [] };
   } catch (err) {
-    watchedState.form.errors = [err.message];
-    watchedState.form.isValid = false;
+    watchedState.form = { isValid: false, errors: [err.message] };
     return;
   }
 

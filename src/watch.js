@@ -36,54 +36,6 @@ export default (state, elementObject) => {
   const element = elementObject;
   initInterface();
 
-  const paintLoading = (status) => {
-    switch (status) {
-      case 'idle':
-        element.button.removeAttribute('disabled');
-        element.inputField.value = '';
-        element.message.classList.remove('text-success', 'text-danger');
-        break;
-      case 'fetching':
-        element.button.setAttribute('disabled', '');
-        break;
-      case 'success':
-        element.button.removeAttribute('disabled');
-        element.inputField.value = '';
-        element.message.textContent = i18next.t('message.successMessage');
-        element.message.classList.remove('text-danger');
-        element.message.classList.add('text-success');
-        break;
-      case 'failure':
-        element.message.innerHTML = `${getHtml(state.loading.errors, 'errors')}`;
-        element.button.removeAttribute('disabled');
-        element.message.classList.add('text-danger');
-        element.message.classList.remove('text-success');
-        break;
-      default:
-        throw new Error(`Unknown status ${status}`);
-    }
-  };
-
-  const paintForm = (valid) => {
-    switch (valid) {
-      case true:
-        element.inputField.classList.remove('is-invalid');
-        element.message.classList.remove('text-danger');
-        element.message.classList.add('text-success');
-        break;
-      case false:
-        element.message.innerHTML = `${getHtml(state.form.errors, 'errors')}`;
-        element.inputField.classList.add('is-invalid');
-        element.message.classList.add('text-danger');
-        element.message.classList.remove('text-success');
-        break;
-      case null:
-        break;
-      default:
-        throw new Error(`Unknown value ${valid}`);
-    }
-  };
-
   return onChange(state, (path) => {
     const {
       uiState,
@@ -93,11 +45,58 @@ export default (state, elementObject) => {
       posts,
     } = state;
 
+    const paintLoading = (status) => {
+      switch (status) {
+        case 'idle':
+          element.button.removeAttribute('disabled');
+          element.inputField.value = '';
+          element.message.classList.remove('text-success', 'text-danger');
+          break;
+        case 'fetching':
+          element.button.setAttribute('disabled', '');
+          break;
+        case 'success':
+          element.button.removeAttribute('disabled');
+          element.inputField.value = '';
+          element.message.textContent = i18next.t('message.successMessage');
+          element.message.classList.remove('text-danger');
+          element.message.classList.add('text-success');
+          element.inputField.classList.remove('is-invalid');
+          break;
+        case 'failure':
+          element.message.innerHTML = `${getHtml(loading.errors, 'errors')}`;
+          element.button.removeAttribute('disabled');
+          element.message.classList.add('text-danger');
+          element.message.classList.remove('text-success');
+          break;
+        default:
+          throw new Error(`Unknown status ${status}`);
+      }
+    };
+
+    const paintForm = (valid) => {
+      switch (valid) {
+        case true:
+          element.inputField.classList.remove('is-invalid');
+          break;
+        case false:
+          element.message.innerHTML = `${getHtml(form.errors, 'errors')}`;
+          element.inputField.classList.add('is-invalid');
+          element.message.classList.add('text-danger');
+          element.message.classList.remove('text-success');
+          break;
+        default:
+          throw new Error(`Unknown value ${valid}`);
+      }
+    };
+
     switch (path) {
       case 'loading.state':
         paintLoading(loading.state);
         break;
-      case 'form.isValid':
+      case 'loading.errors':
+        break;
+      case 'form':
         paintForm(form.isValid);
         break;
       case 'uiState.language':
@@ -130,5 +129,5 @@ export default (state, elementObject) => {
       default:
         throw new Error(`Unknown path ${path}`);
     }
-  }, { ignoreKeys: ['errors'] });
+  });
 };
