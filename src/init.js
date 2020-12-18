@@ -1,6 +1,6 @@
 import i18next from 'i18next';
 import axios from 'axios';
-import { string } from 'yup';
+import * as yup from 'yup';
 import _ from 'lodash';
 import watch from './watch';
 import resources from './locales';
@@ -9,7 +9,7 @@ import parse from './parser';
 import config from './config';
 
 const validateUrl = (url, urls) => {
-  const urlSchema = string().url('noValidUrl').required().notOneOf(urls, 'urlExists');
+  const urlSchema = yup.string().url('noValidUrl').required().notOneOf(urls, 'urlExists');
   urlSchema.validateSync(url);
 };
 
@@ -73,7 +73,7 @@ export default () => {
     debug: false,
     resources,
   })
-    .then((promise) => {
+    .then(() => {
       const state = {
         uiState: {
           language: null,
@@ -115,6 +115,5 @@ export default () => {
       });
 
       setTimeout(() => updateRss(watchedState), config.updateTime);
-      return promise;
     });
 };

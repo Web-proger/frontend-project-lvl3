@@ -32,89 +32,88 @@ const initInterface = () => {
   document.querySelector('#footer-link-text').innerHTML = i18next.t('footerLinkText');
 };
 
-const paintLoading = (status, elementObject, state) => {
-  const element = elementObject;
-  switch (status) {
-    case 'idle':
-      element.button.removeAttribute('disabled');
-      element.inputField.value = '';
-      element.message.classList.remove('text-success', 'text-danger');
-      break;
-    case 'fetching':
-      element.button.setAttribute('disabled', '');
-      break;
-    case 'success':
-      element.button.removeAttribute('disabled');
-      element.inputField.value = '';
-      element.message.textContent = i18next.t('message.successMessage');
-      element.message.classList.remove('text-danger');
-      element.message.classList.add('text-success');
-      break;
-    case 'failure':
-      element.message.innerHTML = `${getHtml(state.loading.errors, 'errors')}`;
-      element.button.removeAttribute('disabled');
-      element.message.classList.add('text-danger');
-      element.message.classList.remove('text-success');
-      break;
-    default:
-      throw new Error(`Unknown status ${status}`);
-  }
-};
-
-const paintForm = (valid, elementObject, state) => {
-  const element = elementObject;
-  switch (valid) {
-    case true:
-      element.inputField.classList.remove('is-invalid');
-      element.message.classList.remove('text-danger');
-      element.message.classList.add('text-success');
-      break;
-    case false:
-      element.message.innerHTML = `${getHtml(state.form.errors, 'errors')}`;
-      element.inputField.classList.add('is-invalid');
-      element.message.classList.add('text-danger');
-      element.message.classList.remove('text-success');
-      break;
-    case null:
-      break;
-    default:
-      throw new Error(`Unknown value ${valid}`);
-  }
-};
-
 export default (state, elementObject) => {
   const element = elementObject;
 
-  return onChange(state, (path, value, previousValue) => {
+  const paintLoading = (status) => {
+    switch (status) {
+      case 'idle':
+        element.button.removeAttribute('disabled');
+        element.inputField.value = '';
+        element.message.classList.remove('text-success', 'text-danger');
+        break;
+      case 'fetching':
+        element.button.setAttribute('disabled', '');
+        break;
+      case 'success':
+        element.button.removeAttribute('disabled');
+        element.inputField.value = '';
+        element.message.textContent = i18next.t('message.successMessage');
+        element.message.classList.remove('text-danger');
+        element.message.classList.add('text-success');
+        break;
+      case 'failure':
+        element.message.innerHTML = `${getHtml(state.loading.errors, 'errors')}`;
+        element.button.removeAttribute('disabled');
+        element.message.classList.add('text-danger');
+        element.message.classList.remove('text-success');
+        break;
+      default:
+        throw new Error(`Unknown status ${status}`);
+    }
+  };
+
+  const paintForm = (valid) => {
+    switch (valid) {
+      case true:
+        element.inputField.classList.remove('is-invalid');
+        element.message.classList.remove('text-danger');
+        element.message.classList.add('text-success');
+        break;
+      case false:
+        element.message.innerHTML = `${getHtml(state.form.errors, 'errors')}`;
+        element.inputField.classList.add('is-invalid');
+        element.message.classList.add('text-danger');
+        element.message.classList.remove('text-success');
+        break;
+      case null:
+        break;
+      default:
+        throw new Error(`Unknown value ${valid}`);
+    }
+  };
+
+  return onChange(state, (path) => {
+    const { uiState, form, loading, feeds, posts } = state;
     switch (path) {
       case 'loading.state':
-        paintLoading(value, element, state);
+        paintLoading(loading.state);
         break;
       case 'form.isValid':
-        paintForm(value, element, state);
+        paintForm(form.isValid);
         break;
       case 'uiState.language':
-        if (previousValue) {
-          document.querySelector(`[data-language=${previousValue}]`).classList.remove('active');
+        if (uiState.language) {
+          document.querySelector(`[data-language=${uiState.language}]`).classList.remove('active');
         }
-        document.querySelector(`[data-language=${value}]`).classList.add('active');
-        i18next.changeLanguage(value).then(initInterface);
+        document.querySelector(`[data-language=${uiState.language}]`).classList.add('active');
+        i18next.changeLanguage(uiState.language).then(initInterface);
         break;
       case 'uiState.previewPostId': {
-        const { title, description, link } = state.posts.find((el) => el.id === value);
+        const { title, description, link } = state.posts.find((el) => el.id === uiState.previewPostId);
         element.modalLink.innerHTML = title;
         element.modalLink.href = link;
         element.modalDescription.innerHTML = description;
         break;
       }
       case 'uiState.viewedPostIds':
-        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml({ posts: state.posts, viewedPostIds: value }, 'posts')}</ul>`;
+        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts')}</ul>`;
         return;
       case 'feeds':
-        element.feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(value, 'feeds')}</ul>`;
+        element.feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(feeds, 'feeds')}</ul>`;
         break;
       case 'posts':
-        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml({ posts: value, viewedPostIds: state.uiState.viewedPostIds }, 'posts')}</ul>`;
+        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts')}</ul>`;
         break;
       default:
         throw new Error(`Unknown path ${path}`);
