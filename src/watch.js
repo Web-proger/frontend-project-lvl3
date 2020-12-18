@@ -34,6 +34,7 @@ const initInterface = () => {
 
 export default (state, elementObject) => {
   const element = elementObject;
+  initInterface();
 
   const paintLoading = (status) => {
     switch (status) {

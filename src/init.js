@@ -67,53 +67,49 @@ const previewClick = (evt, state) => {
   watchedState.uiState.previewPostId = id;
 };
 
-export default () => {
-  i18next.init({
-    lng: config.defaultLanguage,
-    debug: false,
-    resources,
-  })
-    .then(() => {
-      const state = {
-        uiState: {
-          language: null,
-          previewPostId: null,
-          viewedPostIds: [],
-        },
-        form: {
-          isValid: null,
-          errors: [],
-        },
-        loading: {
-          state: 'idle',
-          errors: [],
-        },
-        feeds: [],
-        posts: [],
-      };
+export default () => i18next.init({
+  lng: config.defaultLanguage,
+  debug: false,
+  resources,
+})
+  .then(() => {
+    const state = {
+      uiState: {
+        language: config.defaultLanguage,
+        previewPostId: null,
+        viewedPostIds: [],
+      },
+      form: {
+        isValid: null,
+        errors: [],
+      },
+      loading: {
+        state: 'idle',
+        errors: [],
+      },
+      feeds: [],
+      posts: [],
+    };
 
-      const element = {
-        form: document.querySelector('.rss-form'),
-        message: document.querySelector('.feedback'),
-        feeds: document.querySelector('.feeds'),
-        posts: document.querySelector('.posts'),
-        inputField: document.querySelector('[name=rss-input]'),
-        button: document.querySelector('#submit-button'),
-        modalLink: document.querySelector('#modalLink'),
-        modalDescription: document.querySelector('#postDescription'),
-        language: document.querySelector('#buttons'),
-      };
+    const element = {
+      form: document.querySelector('.rss-form'),
+      message: document.querySelector('.feedback'),
+      feeds: document.querySelector('.feeds'),
+      posts: document.querySelector('.posts'),
+      inputField: document.querySelector('[name=rss-input]'),
+      button: document.querySelector('#submit-button'),
+      modalLink: document.querySelector('#modalLink'),
+      modalDescription: document.querySelector('#postDescription'),
+      language: document.querySelector('#buttons'),
+    };
 
-      const watchedState = watch(state, element);
+    const watchedState = watch(state, element);
 
-      watchedState.uiState.language = config.defaultLanguage;
-
-      element.form.addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
-      element.posts.addEventListener('click', (evt) => previewClick(evt, watchedState));
-      element.language.addEventListener('click', (evt) => {
-        watchedState.uiState.language = evt.target.dataset.language;
-      });
-
-      setTimeout(() => updateRss(watchedState), config.updateTime);
+    element.form.addEventListener('submit', (evt) => handleSubmit(evt, watchedState));
+    element.posts.addEventListener('click', (evt) => previewClick(evt, watchedState));
+    element.language.addEventListener('click', (evt) => {
+      watchedState.uiState.language = evt.target.dataset.language;
     });
-};
+
+    setTimeout(() => updateRss(watchedState), config.updateTime);
+  });
