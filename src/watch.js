@@ -84,7 +84,14 @@ export default (state, elementObject) => {
   };
 
   return onChange(state, (path) => {
-    const { uiState, form, loading, feeds, posts } = state;
+    const {
+      uiState,
+      form,
+      loading,
+      feeds,
+      posts,
+    } = state;
+
     switch (path) {
       case 'loading.state':
         paintLoading(loading.state);
@@ -100,21 +107,25 @@ export default (state, elementObject) => {
         i18next.changeLanguage(uiState.language).then(initInterface);
         break;
       case 'uiState.previewPostId': {
-        const { title, description, link } = state.posts.find((el) => el.id === uiState.previewPostId);
+        const { title, description, link } = posts.find((el) => el.id === uiState.previewPostId);
         element.modalLink.innerHTML = title;
         element.modalLink.href = link;
         element.modalDescription.innerHTML = description;
         break;
       }
-      case 'uiState.viewedPostIds':
-        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts')}</ul>`;
-        return;
+      case 'uiState.viewedPostIds': {
+        const html = getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts');
+        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${html}</ul>`;
+        break;
+      }
       case 'feeds':
         element.feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(feeds, 'feeds')}</ul>`;
         break;
-      case 'posts':
-        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts')}</ul>`;
+      case 'posts': {
+        const html = getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts');
+        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${html}</ul>`;
         break;
+      }
       default:
         throw new Error(`Unknown path ${path}`);
     }
