@@ -13,6 +13,8 @@ const validateUrl = (url, urls) => {
   urlSchema.validateSync(url);
 };
 
+const getUrl = (url) => `${config.proxy}/${url}`;
+
 const handleSubmit = (evt, state) => {
   evt.preventDefault();
   const watchedState = state;
@@ -20,7 +22,7 @@ const handleSubmit = (evt, state) => {
   const formData = new FormData(evt.target);
   const rssUrl = formData.get('rss-input');
   const feedUrls = watchedState.feeds.map((feed) => feed.link);
-  const url = `${config.proxy}/${rssUrl}`;
+  const url = getUrl(rssUrl);
 
   try {
     validateUrl(rssUrl, feedUrls);
@@ -57,7 +59,7 @@ const handleSubmit = (evt, state) => {
 const previewClick = (evt, state) => {
   const watchedState = state;
 
-  if (evt.target.tagName !== 'BUTTON') return;
+  if (evt.target.dataset.toggle !== 'modal') return;
 
   const { id } = evt.target;
 
