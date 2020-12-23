@@ -3,9 +3,22 @@ import i18next from 'i18next';
 
 const getHtml = (data, type) => {
   switch (type) {
-    case 'feeds':
-      return data.map(({ title, description }) => (`<li class="list-group-item"><h3>${title}</h3><p>${description}</p></li>`)).join('');
-    case 'posts':
+    case 'feeds': {
+      const list = document.createElement('ul');
+      list.classList.add('list-group', 'mb-5');
+      data.forEach(({ title, description }) => {
+        const item = document.createElement('li');
+        item.classList.add('list-group-item');
+        const itemTitle = document.createElement('h3');
+        itemTitle.textContent = title;
+        const itemDescription = document.createElement('p');
+        itemDescription.textContent = description;
+        item.append(itemTitle, itemDescription);
+        list.append(item);
+      });
+      return list;
+    }
+    case 'posts': {
       return data.posts.map(({ link, title, id }) => {
         const isViewed = data.viewedPostIds.includes(id);
         return (`<li class="list-group-item ${isViewed ? 'font-weight-normal' : 'font-weight-bold'}">
@@ -13,11 +26,17 @@ const getHtml = (data, type) => {
                    <a href="${link}">${title}</a>
                  </li>`);
       }).join('');
-    case 'errors':
-      return data.map((name) => {
+    }
+    case 'errors': {
+      const container = document.createElement('div');
+      data.forEach((name) => {
         const message = i18next.t(`message.${name}`) === `message.${name}` ? name : i18next.t(`message.${name}`);
-        return (`<div>${message}</div>`);
-      }).join('');
+        const item = document.createElement('div');
+        item.textContent = message;
+        container.append(item);
+      });
+      return container;
+    }
     default:
       throw new Error(`unknownType ${type}`);
   }
@@ -64,7 +83,8 @@ export default (state, elementObject) => {
           element.inputField.classList.remove('is-invalid');
           break;
         case 'failure':
-          element.message.innerHTML = `${getHtml(loading.errors, 'errors')}`;
+          element.message.innerHTML = '';
+          element.message.append(getHtml(loading.errors, 'errors'));
           element.button.removeAttribute('disabled');
           element.message.classList.add('text-danger');
           element.message.classList.remove('text-success');
@@ -80,7 +100,8 @@ export default (state, elementObject) => {
           element.inputField.classList.remove('is-invalid');
           break;
         case false:
-          element.message.innerHTML = `${getHtml(form.errors, 'errors')}`;
+          element.message.innerHTML = '';
+          element.message.append(getHtml(form.errors, 'errors'));
           element.inputField.classList.add('is-invalid');
           element.message.classList.add('text-danger');
           element.message.classList.remove('text-success');
@@ -119,7 +140,8 @@ export default (state, elementObject) => {
         break;
       }
       case 'feeds':
-        element.feeds.innerHTML = `<h2>Feeds</h2><ul class="list-group mb-5">${getHtml(feeds, 'feeds')}</ul>`;
+        element.feeds.innerHTML = '<h2>Feeds</h2>';
+        element.feeds.append(getHtml(feeds, 'feeds'));
         break;
       case 'posts': {
         const html = getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts');
