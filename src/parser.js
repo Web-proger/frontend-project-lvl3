@@ -1,8 +1,10 @@
+import _ from 'lodash';
+
 export default (data) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(data, 'text/xml');
 
-  const hasError = doc.querySelector('parsererror');
+  const hasError = _.isElement(doc.querySelector('parsererror'));
   if (hasError) {
     throw new Error('noValidRss');
   }
