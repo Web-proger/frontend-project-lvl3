@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import _ from 'lodash';
 import watch from './watch';
 import resources from './locales';
-import updateRss from './updateRss';
+import updateRss, { getUrl } from './updateRss';
 import parse from './parser';
 import config from './config';
 
@@ -12,8 +12,6 @@ const validateUrl = (url, urls) => {
   const urlSchema = yup.string().url('noValidUrl').required().notOneOf(urls, 'urlExists');
   urlSchema.validateSync(url);
 };
-
-const getUrl = (url) => `${config.proxy}/${url}`;
 
 const handleSubmit = (evt, state) => {
   evt.preventDefault();

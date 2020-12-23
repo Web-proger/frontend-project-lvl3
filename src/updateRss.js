@@ -3,10 +3,12 @@ import _ from 'lodash';
 import parse from './parser';
 import config from './config';
 
+export const getUrl = (url) => `${config.proxy}/${url}`;
+
 const updateRss = (state) => {
   const watchedState = state;
 
-  const promises = watchedState.feeds.map((feed) => axios.get(`${config.proxy}/${feed.link}`)
+  const promises = watchedState.feeds.map((feed) => axios.get(getUrl(feed.link))
     .then((response) => {
       const { posts: newPosts } = parse(response.data);
       const oldPosts = watchedState.posts.filter((post) => post.feedId === feed.id);
