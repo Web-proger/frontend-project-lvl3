@@ -1,7 +1,7 @@
 import onChange from 'on-change';
 import i18next from 'i18next';
 
-const getHtml = (data, type) => {
+const getElement = (data, type) => {
   switch (type) {
     case 'feeds': {
       const list = document.createElement('ul');
@@ -15,17 +15,33 @@ const getHtml = (data, type) => {
         itemDescription.textContent = description;
         item.append(itemTitle, itemDescription);
         list.append(item);
+        console.log(typeof list);
       });
       return list;
     }
     case 'posts': {
-      return data.posts.map(({ link, title, id }) => {
+      const list = document.createElement('ul');
+      list.classList.add('list-group');
+
+      data.posts.forEach(({ link, title, id }) => {
         const isViewed = data.viewedPostIds.includes(id);
-        return (`<li class="list-group-item ${isViewed ? 'font-weight-normal' : 'font-weight-bold'}">
-                   <button id="${id}" type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#modal">View</button>
-                   <a href="${link}">${title}</a>
-                 </li>`);
-      }).join('');
+
+        const item = document.createElement('li');
+        item.classList.add('list-group-item', isViewed ? 'font-weight-normal' : 'font-weight-bold');
+        const viewButton = document.createElement('button');
+        viewButton.id = id;
+        viewButton.type = 'button';
+        viewButton.classList.add('btn', 'btn-primary', 'mr-3');
+        viewButton.dataset.toggle = 'modal';
+        viewButton.dataset.target = '#modal';
+        viewButton.textContent = 'View';
+        const itemLink = document.createElement('a');
+        itemLink.href = link;
+        itemLink.textContent = title;
+        item.append(viewButton, itemLink);
+        list.append(item);
+      });
+      return list;
     }
     case 'errors': {
       const container = document.createElement('div');
@@ -84,7 +100,7 @@ export default (state, elementObject) => {
           break;
         case 'failure':
           element.message.innerHTML = '';
-          element.message.append(getHtml(loading.errors, 'errors'));
+          element.message.append(getElement(loading.errors, 'errors'));
           element.button.removeAttribute('disabled');
           element.message.classList.add('text-danger');
           element.message.classList.remove('text-success');
@@ -101,7 +117,7 @@ export default (state, elementObject) => {
           break;
         case false:
           element.message.innerHTML = '';
-          element.message.append(getHtml(form.errors, 'errors'));
+          element.message.append(getElement(form.errors, 'errors'));
           element.inputField.classList.add('is-invalid');
           element.message.classList.add('text-danger');
           element.message.classList.remove('text-success');
@@ -134,20 +150,16 @@ export default (state, elementObject) => {
         element.modalDescription.innerHTML = description;
         break;
       }
-      case 'uiState.viewedPostIds': {
-        const html = getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts');
-        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${html}</ul>`;
+      case 'uiState.viewedPostIds':
+      case 'posts': {
+        element.posts.innerHTML = '<h2>Posts</h2>';
+        element.posts.append(getElement({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts'));
         break;
       }
       case 'feeds':
         element.feeds.innerHTML = '<h2>Feeds</h2>';
-        element.feeds.append(getHtml(feeds, 'feeds'));
+        element.feeds.append(getElement(feeds, 'feeds'));
         break;
-      case 'posts': {
-        const html = getHtml({ posts, viewedPostIds: uiState.viewedPostIds }, 'posts');
-        element.posts.innerHTML = `<h2>Posts</h2><ul class="list-group">${html}</ul>`;
-        break;
-      }
       default:
         throw new Error(`Unknown path ${path}`);
     }
